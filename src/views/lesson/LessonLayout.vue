@@ -1,6 +1,7 @@
 <script setup>
-import { Calendar,  Notebook } from '@element-plus/icons-vue'
+import { Calendar, Notebook } from '@element-plus/icons-vue'
 import { RouterView, useRouter } from 'vue-router'
+
 const router = useRouter()
 const handleOpen = () => {
 
@@ -10,8 +11,8 @@ const handleClose = () => {
 }
 </script>
 <template>
-    <el-card style="max-width: 100%">
-      <el-container class="layout-containe">
+  <el-card style="max-width: 100%">
+    <el-container class="layout-containe">
       <el-aside width="220px" style="height: 765px;border-right: 1px solid #dcdfe6;">
         <h5 class="mb-2">Default colors</h5>
         <el-menu
@@ -24,27 +25,38 @@ const handleClose = () => {
         >
           <el-sub-menu index="1">
             <template #title>
-              <el-icon><Notebook /></el-icon>
+              <el-icon>
+                <Notebook />
+              </el-icon>
               <span>备课</span>
             </template>
-            <el-menu-item-group title="Group One">
-              <el-menu-item index="/lesson/mylessonpreparation">我的备课本</el-menu-item>
-            </el-menu-item-group>
-            <el-menu-item-group title="Group Two">
-              <el-menu-item index="1-3">item three</el-menu-item>
-            </el-menu-item-group>
+            <el-menu-item index="/lesson/mylessonpreparation">我的备课本</el-menu-item>
+            <el-menu-item index="/lesson/mylessonpreparation/practice">学生练习题</el-menu-item>
+            <el-menu-item index="/lesson/student/practice">做题</el-menu-item>
+            <el-menu-item index="/lesson/student-feedback">学生反馈</el-menu-item>
+            <el-menu-item index="/lesson/teachingPlan">教案</el-menu-item>
+            <!--            <el-menu-item index="/lesson/mylessonpreparation/TeachingContent">教学内容</el-menu-item>-->
+            <!--            <el-menu-item index="/lesson/mylessonpreparation/TeachingActivitiesArrangement">教学活动安排</el-menu-item>-->
+            <!--            <el-menu-item index="/lesson/mylessonpreparation/TimeAllocation">时间安排</el-menu-item>-->
+            <!--            <el-menu-item index="/lesson/mylessonpreparation/ExpectedResult">预期结果</el-menu-item>-->
           </el-sub-menu>
-          <el-menu-item index="/lesson/lessontable">
-            <el-icon><Calendar /></el-icon>
-            <span>我的课表</span>
-          </el-menu-item>
+          <el-sub-menu index="2">
+            <template #title>
+              <el-icon>
+                <Calendar />
+              </el-icon>
+              <span>课表</span>
+            </template>
+            <el-menu-item index="/lesson/lessontable">我的课表</el-menu-item>
+            <el-menu-item index="/lesson/lesson_hour/mylessonpreparation">课时备课</el-menu-item>
+          </el-sub-menu>
         </el-menu>
       </el-aside>
       <el-main style="width: 100%;padding: 0">
         <router-view></router-view>
       </el-main>
-      </el-container>
-    </el-card>
+    </el-container>
+  </el-card>
 </template>
 
 <style lang="scss" scoped>
@@ -58,6 +70,7 @@ const handleClose = () => {
     //height: 100%;
     width: 100%;
   }
+
   .el-menu-vertical-demo {
     border-right: 0 solid var(--el-menu-border-color);
   }

@@ -20,20 +20,115 @@ const router = createRouter({
           children: [
             {
               path: '/lesson/lessontable',
-              component: () => import('@/views/lesson/LessonTable.vue')
+              component: () => import('@/views/lesson/lessonTable/LessonTable.vue')
             },
             {
               path: '/lesson/mylessonpreparation',
-              component: () => import('@/views/lesson/MyLessonPreparation.vue')
+              component: () => import('@/views/lesson/lessonPreparation/MyLessonPreparation.vue')
             },
             {
               path: '/lesson/mylessonpreparationbook/:lessonPreparationBookId',
-              component: () => import('@/views/lesson/MyLessonPreparationBook.vue')
+              component: () => import('@/views/lesson/lessonPreparation/MyLessonPreparationBook.vue')
             },
             {
-              path: '/lesson/mylessonpreparation/:teacherScheduleId',
-              component: () => import('@/views/lesson/LessonPreparationDetails.vue')
+              path: '/lesson/mylessonpreparation/:chapterLessonPreparationId',
+              component: () => import('@/views/lesson/lessonPreparation/LessonPreparationDetails.vue')
             },
+            {
+              path: '/lesson/mylessonpreparation/TeachingActivitiesArrangement/:chapterLessonPreparationId',
+              component: () => import('@/views/lesson/lessonPreparation/TeachingActivitiesArrangement.vue')
+            },
+            {
+              path: '/lesson/mylessonpreparation/TimeAllocation/:chapterLessonPreparationId',
+              component: () => import('@/views/lesson/lessonPreparation/TimeAllocation.vue')
+            },
+            {
+              path: '/lesson/mylessonpreparation/practice',
+              component: () => import('@/views/lesson/practiceQuestion.vue')
+            },
+            {
+              path: '/lesson/mylessonpreparation/ExpectedResult/:chapterLessonPreparationId',
+              component: () => import('@/views/lesson/lessonPreparation/ExpectedResult.vue')
+            },
+            {
+              path: '/lesson/mylessonpreparation/TeachingContent/:chapterLessonPreparationId',
+              component: () => import('@/views/lesson/lessonPreparation/TeachingContent.vue')
+            },
+            {
+              path: '/lesson/pre-feedback/:teacherScheduleId',
+              component: () => import('@/views/lesson/lessonPreparation/PreFeedback.vue')
+            },
+            {
+              path: '/lesson/post-feedback/:teacherScheduleId',
+              component: () => import('@/views/lesson/lessonPreparation/PostFeedback.vue')
+            },
+            {
+              path: '/lesson/student-feedback',
+              component: () => import('@/views/lesson/lessonPreparation/StudentFeedback.vue')
+            },
+            {
+              path: '/lesson/teachingPlan',
+              component: () => import('@/views/lesson/lessonPreparation/TeachingPlan.vue')
+            },
+            {
+              path: '/lesson/lesson_hour/mylessonpreparation',
+              component: () => import('@/views/lesson/lessonTable/MyLessonPreparation.vue')
+            },
+            {
+              path: '/lesson/lesson_hour/mylessonpreparationbook/:lessonPreparationBookId',
+              component: () => import('@/views/lesson/lessonTable/MyLessonPreparationBook.vue')
+            },
+            {
+              path: '/lesson/lesson_hour/mylessonpreparation/:teacherScheduleId',
+              component: () => import('@/views/lesson/lessonTable/LessonPreparationDetails.vue')
+            },
+            {
+              path: '/lesson/lesson_hour/mylessonpreparation/TeachingActivitiesArrangement/:teacherScheduleId',
+              component: () => import('@/views/lesson/lessonTable/TeachingActivitiesArrangement.vue')
+            },
+            {
+              path: '/lesson/lesson_hour/mylessonpreparation/TimeAllocation/:teacherScheduleId',
+              component: () => import('@/views/lesson/lessonTable/TimeAllocation.vue')
+            },
+            {
+              path: '/lesson/lesson_hour/mylessonpreparation/ExpectedResult/:teacherScheduleId',
+              component: () => import('@/views/lesson/lessonTable/ExpectedResult.vue')
+            },
+            {
+              path: '/lesson/lesson_hour/mylessonpreparation/TeachingContent/:teacherScheduleId',
+              component: () => import('@/views/lesson/lessonTable/TeachingContent.vue')
+            },
+            {
+              path: '/lesson/student/practice',
+              component: () => import('@/views/lesson/practice/StudentPractice.vue')
+            },
+            {
+              path: '/lesson/practice',
+              component: () => import('@/views/lesson/createQuestion1.vue'),
+              redirect: '/lesson/practice/generate',
+              children: [
+                {
+                  path: '/lesson/practice/generate/:teacherScheduleId',
+                  component: () => import('@/views/lesson/practice/IntelligentQuestionGeneration.vue')
+                },
+                {
+                  path: '/lesson/practice/stats/:teacherScheduleId',
+                  component: () => import('@/views/lesson/practice/StatisticalAnalysis.vue')
+                },
+                {
+                  path: '/lesson/practice/question-bank/:teacherScheduleId',
+                  component: () => import('@/views/lesson/practice/QuestionBankManagement.vue')
+                },
+                {
+                  path: '/lesson/practice/question-detail/:questionId',
+                  component: () => import('@/views/lesson/practice/QuestionDetail.vue')
+                },
+                {
+                  path: '/lesson/practice/ai-assistant',
+                  component: () => import('@/views/lesson/practice/AiAssistant.vue')
+                }
+              ]
+            }
           ]
         }
       ]

@@ -3,6 +3,7 @@ import { ref, onMounted, computed } from 'vue'
 import { teacherScheduleGetService, teacherScheduleReassignmentService } from '@/api/teacherSchedule.js'
 import { classRoomGetAllService } from '@/api/classRoom.js'
 
+const importLessonTableVisable = ref(false)
 const dialogFormVisible = ref(false)
 const classRoomList = ref()
 const reassignmentForm = ref({
@@ -11,6 +12,7 @@ const reassignmentForm = ref({
   weekNumber: '',
   classroom: ''
 })
+const uploadedFiles = ref([]);
 const times = ref(['8:00-9:40', '10:00-11:40', '14:00-15:40', '16:00-17:40', '19:00-20:40'])
 const colorList = ['#e6f7ff','#ffebd7','#d1f7e6','#ffe6d7','#e6f7d7','#f7e6ff','#d7e6ff','#e6d7ff','#d7ffe6']
 const getRandomColor = () => {
@@ -18,6 +20,18 @@ const getRandomColor = () => {
   // 返回随机索引对应的颜色
   return colorList[randomIndex];
 }
+
+// 文件处理方法
+const handleFileChange = (file) => {
+  uploadedFiles.value.push(file.raw);
+};
+
+const handleFileRemove = (file, fileList) => {
+  const index = uploadedFiles.value.findIndex(f => f.name === file.name);
+  if (index !== -1) {
+    uploadedFiles.value.splice(index, 1);
+  }
+};
 const queryTeacherScheduleForm = ref({
   year: '2024',
   weekNumber: 6,
@@ -173,10 +187,14 @@ const goReassignment = async () => {
         </el-select>
       </el-form-item>
 
-      <el-form-item size="large">
+      <el-form-item size="large" style="margin-right: 280px">
         <el-button type="primary" @click="goQuery">查询</el-button>
       </el-form-item>
+      <el-form-item size="large">
+        <el-button @click="importLessonTableVisable = true"><i class="fas fa-download"></i> 导入</el-button>
+      </el-form-item>
     </el-form>
+
     <table>
       <thead>
       <tr>
@@ -277,6 +295,26 @@ const goReassignment = async () => {
         </el-button>
       </div>
     </template>
+  </el-dialog>
+
+  <el-dialog v-model="importLessonTableVisable" title="课表导入" width="800">
+    <el-upload
+      class="upload-area custom-upload"
+      drag
+      multiple
+      :auto-upload="false"
+      :on-change="handleFileChange"
+      :on-remove="handleFileRemove"
+      accept=".doc,.docx,.pdf">
+      <el-icon class="el-icon--upload"><i class="fas fa-cloud-upload-alt"></i></el-icon>
+      <div class="el-upload__text">
+        拖放文件到此处或<em>浏览文件</em>
+      </div>
+      <template #tip>
+        <div class="file-hint">支持的格式: DOC, PDF</div>
+      </template>
+    </el-upload>
+    <el-button type="primary" style="margin-top: 15px;transform: translateX(670px)" >导入</el-button>
   </el-dialog>
 
 </template>
@@ -380,4 +418,54 @@ th {
 .dialog-content button:hover {
   background-color: #0056b3;
 }
+
+.btn-outline {
+  background-color: transparent;
+  border: 1px solid #dee2e6;
+  color: #495057;
+  position: relative;
+}
+
+.btn-outline:hover {
+  background-color: #f8f9fa;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+/* 上传区域自定义样式 */
+.custom-upload {
+  width: 95%;
+}
+.upload-area {
+  border: 2px dashed #dee2e6;
+  border-radius: 8px;
+  padding: 30px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.el-icon--upload {
+  font-size: 32px !important;
+  color: #3b82f6 !important;
+  margin-bottom: 16px;
+}
+.file-hint {
+  margin-top: 8px;
+  color: #94a3b8;
+  font-size: 12px;
+}
+.el-upload__text {
+  color: #64748b;
+}
+
 </style>

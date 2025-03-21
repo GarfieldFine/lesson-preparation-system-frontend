@@ -2,7 +2,7 @@ import axios from 'axios'
 import { useUserStore } from '@/stores'
 import router from '@/router'
 const baseURL = 'http://localhost:8080'
-const timeout = 60000
+const timeout = 600000
 const instance = axios.create({
   baseURL,
   timeout

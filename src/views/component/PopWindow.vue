@@ -8,16 +8,16 @@ const courseList = ref([])
 const classList = ref([])
 const form = ref({
   courseId: '',
-  classId: '',
+  // classId: '',
   startLessonTime: '',
   term: 0
 })
 const emit = defineEmits(['changeCreated'])
 const popWindowVisible = async () => {
   dialogTableVisible.value = true
-  const res1 = await classGetAllNameService()
-  classList.value = res1.data
-  console.log(res1)
+  // const res1 = await classGetAllNameService()
+  // classList.value = res1.data
+  // console.log(res1)
   const res2 = await courseGetAllNameService()
   console.log(res2)
   courseList.value = res2.data
@@ -34,11 +34,11 @@ const onSubmit = async () => {
     return
   }
 
-  // 检查 classId 是否为空
-  if (!form.value.classId) {
-    ElMessage.error('班级不能为空')
-    return
-  }
+  // // 检查 classId 是否为空
+  // if (!form.value.classId) {
+  //   ElMessage.error('班级不能为空')
+  //   return
+  // }
 
   // 检查 startLessonTime 是否为空
   if (!form.value.startLessonTime) {
@@ -57,7 +57,7 @@ defineExpose({
 </script>
 <template>
   <div>
-    <el-dialog v-model="dialogTableVisible" width="450" style="height: 420px;" center>
+    <el-dialog v-model="dialogTableVisible" width="450" style="height: 370px;" center>
       <el-form :model="form" label-width="auto" style="max-width: 350px">
         <el-form-item label="课程">
           <el-select size="large" v-model="form.courseId" placeholder="请选择课程">
@@ -65,11 +65,11 @@ defineExpose({
           </el-select>
         </el-form-item>
 
-          <el-form-item label="班级">
-            <el-select size="large" v-model="form.classId" placeholder="请选择班级">
-              <el-option v-for="cl in classList" :key="cl.id" :label="cl.className" :value="cl.id" />
-            </el-select>
-          </el-form-item>
+<!--          <el-form-item label="班级">-->
+<!--            <el-select size="large" v-model="form.classId" placeholder="请选择班级">-->
+<!--              <el-option v-for="cl in classList" :key="cl.id" :label="cl.className" :value="cl.id" />-->
+<!--            </el-select>-->
+<!--          </el-form-item>-->
 
           <el-form-item label="开课时间">
             <el-date-picker

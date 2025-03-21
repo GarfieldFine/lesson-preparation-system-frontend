@@ -11,3 +11,27 @@ export const lessonPreparationRecordAddGetService = ({courseId,classId,startLess
 export const lessonPreparationRecordGetGetService = (teacherId) => {
   return request.get(`/lessonPreparationRecord/get/${teacherId}`)
 }
+
+export const lessonPreparationRecordGetClassNameService = (id) => {
+  return request.get(`/lessonPreparationRecord/get/class/${id}`)
+}
+
+export const lessonPreparationRecordAddClassService = (id,classId) => {
+  return request.post('/lessonPreparationRecord/add/class',{
+    id,
+    classId
+  })
+}
+
+export const lessonPreparationRecordUpdateClassService = (lessonPreparationRecordId,classIds) => {
+  return request.post('/lessonPreparationRecord/update/class',{
+    lessonPreparationRecordId,
+    classIds
+  })
+}
+export const lessonPreparationRecordUpdateTeachingStateService = (lessonPreparationRecordId,teachingState) => {
+  return request.post('/lessonPreparationRecord/update/teachingState',{
+    lessonPreparationRecordId,
+    teachingState
+  })
+}
