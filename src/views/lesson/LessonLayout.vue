@@ -13,8 +13,7 @@ const handleClose = () => {
 <template>
   <el-card style="max-width: 100%">
     <el-container class="layout-containe">
-      <el-aside width="220px" style="height: 765px;border-right: 1px solid #dcdfe6;">
-        <h5 class="mb-2">Default colors</h5>
+      <el-aside width="220px" style="height: 800px;border-right: 1px solid #dcdfe6;">
         <el-menu
           default-active="2"
           class="el-menu-vertical-demo"
@@ -35,10 +34,13 @@ const handleClose = () => {
             <el-menu-item index="/lesson/student/practice">做题</el-menu-item>
             <el-menu-item index="/lesson/student-feedback">学生反馈</el-menu-item>
             <el-menu-item index="/lesson/teachingPlan">教案</el-menu-item>
-            <!--            <el-menu-item index="/lesson/mylessonpreparation/TeachingContent">教学内容</el-menu-item>-->
-            <!--            <el-menu-item index="/lesson/mylessonpreparation/TeachingActivitiesArrangement">教学活动安排</el-menu-item>-->
-            <!--            <el-menu-item index="/lesson/mylessonpreparation/TimeAllocation">时间安排</el-menu-item>-->
-            <!--            <el-menu-item index="/lesson/mylessonpreparation/ExpectedResult">预期结果</el-menu-item>-->
+            <el-menu-item index="/lesson/student/questionBank">学生题库</el-menu-item>
+            <el-menu-item index="/lesson/lesson_hour/studentDetail">学生详情</el-menu-item>
+            <el-menu-item index="/lesson/examGen">生成考试内容</el-menu-item>
+            <el-menu-item index="/lesson/student/exam">考试</el-menu-item>
+            <el-menu-item index="/lesson/teachingCalendar">教学日历</el-menu-item>
+            <el-menu-item index="/lesson/overAllGeneration">整体生成</el-menu-item>
+
           </el-sub-menu>
           <el-sub-menu index="2">
             <template #title>
@@ -48,7 +50,8 @@ const handleClose = () => {
               <span>课表</span>
             </template>
             <el-menu-item index="/lesson/lessontable">我的课表</el-menu-item>
-            <el-menu-item index="/lesson/lesson_hour/mylessonpreparation">课时备课</el-menu-item>
+            <el-menu-item index="/lesson/lesson_hour/mylessonpreparation">课时备课本</el-menu-item>
+            <el-menu-item index="/lesson/mylessonpreparation">章节备课本</el-menu-item>
           </el-sub-menu>
         </el-menu>
       </el-aside>

@@ -6,7 +6,6 @@ import '@/assets/main.scss'
 import '@fortawesome/fontawesome-free/css/all.css'
 
 
-
 const app = createApp(App)
 
 app.use(pinia)

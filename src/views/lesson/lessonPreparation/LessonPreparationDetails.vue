@@ -22,7 +22,7 @@ const AiGenerateTeachingSign = ref({
   topic: '',
   teachingContentArrangementStr: '',
   timeAllocation: [],
-  numberOfLessons: '',
+  numberOfLessons: '1',
   expectedResultStr: ''
 })
 //弹窗控制变量
@@ -36,6 +36,13 @@ const router = useRouter()
 
 onMounted(async () => {
 })
+
+const goToTeachingPlan = () => {
+// 这里是跳转到教案生成页面的逻辑
+  console.log('跳转到教案生成页面')
+// 实际实现可以使用 router.push 进行路由跳转
+  router.push(`/lesson/teachingPlan/${chapterLessonPreparationId}`)
+}
 
 const goAiGenerate = async () => {
   fullscreenLoading.value = true;
@@ -141,10 +148,6 @@ const teachingTips = [
           </div>
         </div>
         <div class="action-buttons">
-          <el-button type="primary" @click="openConfirm" :loading="fullscreenLoading">
-            <el-icon><Magic /></el-icon>
-            AI辅助备课
-          </el-button>
           <el-button type="success">
             <el-icon><Check /></el-icon>
             保存备课
@@ -187,16 +190,6 @@ const teachingTips = [
                 <h3>欢迎使用智能章节备课系统</h3>
                 <p>选择上方导航开始编辑，或使用AI辅助快速生成备课内容</p>
               </template>
-              <div class="quick-actions">
-                <el-button type="primary" plain @click="goToTeachingActivities">
-                  <el-icon><Edit /></el-icon>
-                  开始编辑
-                </el-button>
-                <el-button type="success" plain @click="openConfirm">
-                  <el-icon><Magic /></el-icon>
-                  AI生成
-                </el-button>
-              </div>
             </el-empty>
           </div>
         </div>
@@ -205,17 +198,17 @@ const teachingTips = [
           <div class="tools-panel">
             <h3>教学工具</h3>
             <div class="tool-buttons">
-              <el-button class="tool-btn" type="primary" plain>
-                <el-icon><VideoCamera /></el-icon>
-                多媒体资源生成
-              </el-button>
-              <el-button class="tool-btn" type="primary" plain @click="goPracticeQuestionGeneration">
-                <el-icon><EditPen /></el-icon>
-                练习题生成
-              </el-button>
-              <el-button class="tool-btn" type="primary" plain>
+<!--              <el-button class="tool-btn" type="primary" plain>-->
+<!--                <el-icon><VideoCamera /></el-icon>-->
+<!--                多媒体资源生成-->
+<!--              </el-button>-->
+<!--              <el-button class="tool-btn" type="primary" plain @click="goPracticeQuestionGeneration">-->
+<!--                <el-icon><EditPen /></el-icon>-->
+<!--                练习题生成-->
+<!--              </el-button>-->
+              <el-button class="tool-btn" type="primary" plain @click="goToTeachingPlan">
                 <el-icon><Files /></el-icon>
-                教案导出
+                教案生成
               </el-button>
             </div>
           </div>

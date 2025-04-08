@@ -7,7 +7,7 @@ const router = createRouter({
     {
       path: '/',
       component: () => import('@/views/layout/LayoutContainer.vue'),
-      redirect: '/app/index',
+      redirect: '/lesson/lesson_hour/mylessonpreparation',
       children: [
         {
           path: '/app/index',
@@ -16,7 +16,7 @@ const router = createRouter({
         {
           path: '/lesson',
           component: () => import('@/views/lesson/LessonLayout.vue'),
-          redirect: '/lesson/lessontable',
+          redirect: '/lesson/lesson_hour/mylessonpreparation',
           children: [
             {
               path: '/lesson/lessontable',
@@ -67,8 +67,28 @@ const router = createRouter({
               component: () => import('@/views/lesson/lessonPreparation/StudentFeedback.vue')
             },
             {
-              path: '/lesson/teachingPlan',
+              path: '/lesson/teachingPlan/:chapterLessonPreparationId',
               component: () => import('@/views/lesson/lessonPreparation/TeachingPlan.vue')
+            },
+            {
+              path: '/lesson/student/questionBank',
+              component: () => import('@/views/lesson/lessonPreparation/StudentQuestionBank.vue')
+            },
+            {
+              path: '/lesson/student/doPractice/:questionId',
+              component: () => import('@/views/lesson/lessonPreparation/StudentDoPractice.vue')
+            },
+            {
+              path: '/lesson/examGen',
+              component: () => import('@/views/lesson/lessonPreparation/ExamGen.vue')
+            },
+            {
+              path: '/lesson/student/exam',
+              component: () => import('@/views/lesson/lessonPreparation/StudentExamination.vue')
+            },
+            {
+              path: '/lesson/teachingCalendar/:lessonPreparationRecId',
+              component: () => import('@/views/lesson/lessonPreparation/teachingCalendar.vue')
             },
             {
               path: '/lesson/lesson_hour/mylessonpreparation',
@@ -97,6 +117,14 @@ const router = createRouter({
             {
               path: '/lesson/lesson_hour/mylessonpreparation/TeachingContent/:teacherScheduleId',
               component: () => import('@/views/lesson/lessonTable/TeachingContent.vue')
+            },
+            {
+              path: '/lesson/lesson_hour/studentDetail',
+              component: () => import('@/views/lesson/lessonTable/StudentDetail.vue')
+            },
+            {
+              path: '/lesson/overAllGeneration/:teacherScheduleId',
+              component: () => import('@/views/lesson/lessonTable/OverallAIGeneration.vue')
             },
             {
               path: '/lesson/student/practice',

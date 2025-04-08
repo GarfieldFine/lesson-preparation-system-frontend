@@ -130,7 +130,10 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import * as echarts from 'echarts';
-
+import { statisticsQuestionSolvingSituations } from '@/api/question.js'
+import { useRoute } from 'vue-router';
+const route = useRoute();
+const teacherScheduleId = route.params.teacherScheduleId
 const statsFilter = ref({
   timeRange: 'month',
   class: 'all',
@@ -143,8 +146,27 @@ const answerFrequencyChart = ref(null);
 const errorRateChart = ref(null);
 const questionTypeChart = ref(null);
 const studentProgressChart = ref(null);
+const frequencyChartData = ref({
+  frequencyChartDataIdList: [],
+  frequencyChartDataAnswerCountList: []
+})
+const errorChartData = ref({
+  errorChartDataIdList: [],
+  errorChartDataAccuracyList: []
+})
+const typeChartData = ref([])
 
-onMounted(() => {
+onMounted(async () => {
+  const res = await statisticsQuestionSolvingSituations(teacherScheduleId)
+  frequencyChartData.value.frequencyChartDataIdList = res.data.frequencyAnsweringQuestions.map(item => '题目' + item.id)
+  frequencyChartData.value.frequencyChartDataAnswerCountList = res.data.frequencyAnsweringQuestions.map(item => item.answerCount)
+
+  errorChartData.value.errorChartDataIdList = res.data.highErrorRateQuestions.map(item => '题目' + item.id)
+  errorChartData.value.errorChartDataAccuracyList = res.data.highErrorRateQuestions.map(item => item.accuracy)
+
+  console.log(res.data.questionCountList)
+  typeChartData.value = res.data.questionCountList
+
   initCharts();
 });
 
@@ -155,28 +177,29 @@ const initCharts = () => {
     title: { text: '题目答题频次TOP10' },
     tooltip: {},
     xAxis: { type: 'value' },
-    yAxis: { type: 'category', data: ['题目1', '题目2', '题目3', '题目4', '题目5'] },
+    yAxis: { type: 'category', data: frequencyChartData.value.frequencyChartDataIdList },
     series: [{
       type: 'bar',
-      data: [234, 187, 156, 123, 98],
+      data: frequencyChartData.value.frequencyChartDataAnswerCountList,
       itemStyle: {
         color: '#0284c7'
       }
     }]
   });
 
+
   // 初始化错误率图表
   const errorChart = echarts.init(errorRateChart.value);
   errorChart.setOption({
     title: { text: '错误率最高的题目' },
     tooltip: {},
-    xAxis: { type: 'value', max: 100 },
-    yAxis: { type: 'category', data: ['题目A', '题目B', '题目C', '题目D', '题目E'] },
+    yAxis: { type: 'value', max: 1, name: '正确率' },
+    xAxis: { type: 'category', data: errorChartData.value.errorChartDataIdList },
     series: [{
       type: 'bar',
-      data: [85, 72, 68, 65, 60],
+      data: errorChartData.value.errorChartDataAccuracyList,
       itemStyle: {
-        color: '#ef4444'
+        color: '#ea580c'
       }
     }]
   });
@@ -193,10 +216,10 @@ const initCharts = () => {
       type: 'pie',
       radius: ['40%', '70%'],
       data: [
-        { value: 435, name: '选择题' },
-        { value: 234, name: '填空题' },
-        { value: 156, name: '简答题' },
-        { value: 98, name: '判断题' }
+        { value: typeChartData.value[0], name: '选择题' },
+        { value: typeChartData.value[1], name: '填空题' },
+        { value: typeChartData.value[2], name: '判断题' },
+        { value: typeChartData.value[3], name: '简答题' }
       ]
     }]
   });

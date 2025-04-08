@@ -85,7 +85,7 @@ const setActiveCategory = (planning) => {
   // 设置新的计时器，延迟800毫秒后展开
   hoverTimer.value = setTimeout(() => {
     activeCategory.value = planning
-  }, 350)
+  }, 800)
 }
 
 // 鼠标离开时清除计时器并关闭展开
@@ -129,6 +129,20 @@ const getRandomColor = (index) => {
   // 根据索引选择颜色，如果超出范围则循环使用
   return gradients[index % gradients.length];
 }
+
+const goToTeachingCalendar = () => {
+// 这里是跳转到教学日历页面的逻辑
+  console.log('跳转到教学日历页面')
+// 实际实现可以使用 router.push 进行路由跳转
+  router.push(`/lesson/teachingCalendar/${LessonPreparationRecId}`)
+}
+
+// const goToTeachingPlan = () => {
+// // 这里是跳转到教案生成页面的逻辑
+//   console.log('跳转到教案生成页面')
+// // 实际实现可以使用 router.push 进行路由跳转
+//   router.push(`/lesson/teachingPlan/${LessonPreparationRecId}`)
+// }
 </script>
 
 <template>
@@ -164,9 +178,17 @@ const getRandomColor = (index) => {
             <p class="info-value">{{ classesString || '暂无班级' }}</p>
           </div>
         </div>
-        <el-button type="primary" class="add-class-button" @click="dialogFormVisible = true">
-          <i class="el-icon-plus"></i> 添加班级
-        </el-button>
+        <div class="teaching-tools-buttons">
+          <el-button type="primary" class="teaching-tool-button" @click="goToTeachingCalendar">
+            <i class="el-icon-date"></i> 教学日历
+          </el-button>
+<!--          <el-button type="success" class="teaching-tool-button" @click="goToTeachingPlan">-->
+<!--            <i class="el-icon-document"></i> 教案生成-->
+<!--          </el-button>-->
+          <el-button type="primary" class="add-class-button" @click="dialogFormVisible = true">
+            <i class="el-icon-plus"></i> 添加班级
+          </el-button>
+        </div>
       </div>
     </div>
 
@@ -308,6 +330,30 @@ const getRandomColor = (index) => {
   padding: 2rem;
   color: #2c3e50;
   font-family: 'PingFang SC', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+// 添加教学工具按钮样式
+.teaching-tools-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.teaching-tool-button {
+  border: none;
+  border-radius: 10px;
+  padding: 0.75rem 1.25rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.3);
+  }
+
+  i {
+    margin-right: 0.5rem;
+  }
 }
 
 // 添加展开/收起动画
@@ -904,3 +950,4 @@ const getRandomColor = (index) => {
   }
 }
 </style>
+

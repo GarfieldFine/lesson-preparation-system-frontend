@@ -4,11 +4,25 @@ import { onMounted,ref} from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { chapterLessonPreparationGetListByIdService, chapterLessonPreparationAiGenerateTeachingSignService, chapterLessonPreparationUpdateService } from '@/api/chapterLessonPreparation.js'
 
-import { Document, Timer, Aim, Reading, Check, Clock, Calendar, Edit, VideoCamera, EditPen, Files } from '@element-plus/icons-vue'
+import {
+  Document,
+  Timer,
+  Aim,
+  Reading,
+  Check,
+  Clock,
+  Calendar,
+  Edit,
+  VideoCamera,
+  EditPen,
+  Files,
+  MagicStick
+} from '@element-plus/icons-vue'
 
 import 'md-editor-v3/lib/preview.css';
 
 import 'md-editor-v3/lib/style.css';
+import { ElMessage } from 'element-plus'
 
 
 const teacherScheduleId = useRoute().params.teacherScheduleId
@@ -45,18 +59,8 @@ const goAiGenerate = async () => {
   dialogFormVisible.value = false
   ElMessage.success('生成成功')
 }
-const openConfirm = async () => {
-  await ElMessageBox.confirm(
-    '确定要使用ai生成吗？',
-    '提示',
-    {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'info'
-    }
-  )
-  const res = await goAiGenerate()
-  AiGenerateTeachingSign.value = res.data
+const openConfirm = () => {
+  router.push(`/lesson/overAllGeneration/${teacherScheduleId}`)
 }
 const saveContent = async () => {
   const res = await chapterLessonPreparationUpdateService(teacherScheduleId, AiGenerateTeachingSign.value)
@@ -87,7 +91,9 @@ const goPracticeQuestionGeneration = () => {
 const goPreFeedBack = () => {
   router.push(`/lesson/pre-feedback/${teacherScheduleId}`)
 }
-
+const goRestore = () => {
+  ElMessage.success('保存成功')
+}
 // 添加当前激活的菜单状态
 const activeMenu = ref('')
 
@@ -144,11 +150,11 @@ const teachingTips = [
         </div>
         <div class="action-buttons">
           <el-button type="primary" @click="openConfirm" :loading="fullscreenLoading">
-            <el-icon><Magic /></el-icon>
+            <el-icon><MagicStick /></el-icon>
             AI辅助备课
           </el-button>
           <el-button type="success">
-            <el-icon><Check /></el-icon>
+            <el-icon @click="goRestore"><Check /></el-icon>
             保存备课
           </el-button>
         </div>
@@ -195,7 +201,7 @@ const teachingTips = [
                   开始编辑
                 </el-button>
                 <el-button type="success" plain @click="openConfirm">
-                  <el-icon><Magic /></el-icon>
+                  <el-icon><MagicStick /></el-icon>
                   AI生成
                 </el-button>
               </div>

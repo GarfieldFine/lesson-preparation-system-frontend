@@ -20,6 +20,20 @@
           </el-card>
         </el-col>
       </el-row>
+      <el-row>
+        <el-col :span="24">
+          <el-card class="chart-card">
+            <template #header>
+              <div class="card-header">
+                <span>学生反馈关键词</span>
+                <el-tag type="info" size="small">词频统计</el-tag>
+              </div>
+            </template>
+<!--            <word-cloud :data="predefinedKeywords"></word-cloud>-->
+            <div ref="wordCloudChartRef" class="chart"></div>
+          </el-card>
+        </el-col>
+      </el-row>
     </div>
 
     <!-- 学生反馈展示 -->
@@ -83,12 +97,16 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import * as echarts from 'echarts'
+
+
 import { useRoute, useRouter } from 'vue-router'
 import { analysisStudentPostLessonFeedback } from '@/api/feedback.js'
+import WordCloud from '@/views/component/WordCloud.vue'
 
 const router = useRouter()
 const satisfactionChartRef = ref(null)
 const participationChartRef = ref(null)
+const wordCloudChartRef = ref(null)
 
 const aiSummary = ref('本节课学生参与度较高，课堂氛围活跃。根据统计，90%的学生能够积极参与课堂互动，85%的学生对课程内容表示满意。建议在下次课程中增加更多实践环节，进一步提高学习效果。')
 const teacherScheduleId = useRoute().params.teacherScheduleId
@@ -231,13 +249,94 @@ const formatAiSummary = (text) => {
 
   return formatted;
 }
+const predefinedKeywords = [
+  { name: '课程内容', value: 3000 },
+  { name: '讲解清晰', value: 2800 },
+  { name: '实践环节', value: 2600 },
+  { name: '互动性', value: 2400 },
+  { name: '有趣', value: 2200 },
+  { name: '案例分析', value: 2000 },
+  { name: '节奏适中', value: 1800 },
+  { name: '收获很大', value: 1600 },
+  { name: '教学方法', value: 1400 },
+  { name: '课堂氛围', value: 1200 },
+  { name: '知识点', value: 1000 },
+  { name: '练习时间', value: 900 },
+  { name: '理解深入', value: 800 },
+  { name: '思路清晰', value: 700 },
+  { name: '难度适中', value: 600 },
+  { name: '生动形象', value: 500 },
+  { name: '启发思考', value: 450 },
+  { name: '实用性强', value: 400 },
+  { name: '课件设计', value: 350 },
+  { name: '提问方式', value: 300 },
+  { name: '反馈及时', value: 250 },
+  { name: '学习效果', value: 200 }
+];
+
+// 初始化词云图
+const initWordCloudChart = () => {
+  // 使用预设的关键词数据，确保词云图能够正确显示
+
+  if(wordCloudChartRef){
+    const chart = echarts.init(wordCloudChartRef.value);
+    const option = {
+      series: [{
+        type: 'wordCloud',
+        shape: 'star',
+        left: 'center',
+        top: 'center',
+        width: '80%',
+        height: '80%',
+        right: null,
+        bottom: null,
+        sizeRange: [12, 50],
+        rotationRange: [-90, 90],
+        rotationStep: 45,
+        gridSize: 8,
+        drawOutOfBound: false,
+        textStyle: {
+          fontFamily: 'sans-serif',
+          fontWeight: 'bold',
+          color: function () {
+            return getRandomColor();
+          }
+        },
+        emphasis: {
+          focus: 'self',
+          textStyle: {
+            shadowBlur: 10,
+            shadowColor: '#333'
+          }
+        },
+        data: predefinedKeywords
+      }]
+    };
+
+    chart.setOption(option)
+  }
+
+}
+
+// 生成随机颜色
+const getRandomColor = () => {
+  const colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'];
+  return colors[Math.floor(Math.random() * colors.length)];
+};
 
 onMounted(async () => {
-  const res = await analysisStudentPostLessonFeedback(teacherScheduleId)
-  initSatisfactionChart(res.data)
-  initParticipationChart(res.data)
-  studentFeedbacks.value = res.data.studentFeedbacks
-  aiSummary.value = res.data.aiSummary
+  try {
+    const res = await analysisStudentPostLessonFeedback(teacherScheduleId)
+    initSatisfactionChart(res.data)
+    initParticipationChart(res.data)
+    // 确保即使没有反馈数据也能显示词云图
+    initWordCloudChart()
+    studentFeedbacks.value = res.data.studentFeedbacks
+    aiSummary.value = res.data.aiSummary
+  } catch (error) {
+    console.error('获取反馈数据失败:', error)
+    ElMessage.error('获取反馈数据失败，请稍后再试')
+  }
 })
 </script>
 

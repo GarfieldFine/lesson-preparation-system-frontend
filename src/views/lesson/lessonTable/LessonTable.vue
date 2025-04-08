@@ -187,9 +187,10 @@ const goReassignment = async () => {
         </el-select>
       </el-form-item>
 
-      <el-form-item size="large" style="margin-right: 280px">
+      <el-form-item size="large" style="margin-right: 150px">
         <el-button type="primary" @click="goQuery">查询</el-button>
       </el-form-item>
+
       <el-form-item size="large">
         <el-button @click="importLessonTableVisable = true"><i class="fas fa-download"></i> 导入</el-button>
       </el-form-item>
@@ -314,7 +315,7 @@ const goReassignment = async () => {
         <div class="file-hint">支持的格式: DOC, PDF</div>
       </template>
     </el-upload>
-    <el-button type="primary" style="margin-top: 15px;transform: translateX(670px)" >导入</el-button>
+    <el-button type="primary" style="margin-top: 15px;transform: translateX(670px)"   >导入</el-button>
   </el-dialog>
 
 </template>
@@ -340,132 +341,329 @@ $colors: (
 .course-table {
   width: 100%;
   max-width: 1200px;
-  margin: 0 auto;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  margin-top: 2rem;
 }
 
 th, td {
-  border: 1px solid #ddd;
-  padding: 4px;
+  border: none;
+  padding: 0;
   text-align: center;
-  //height: 140px; /* 设置格子高度为50px */
-  //width: 139px;
-  height: 135px; /* 设置格子高度为50px */
+  height: 140px;
   width: 137px;
+  position: relative;
+  overflow: hidden;
 }
 
 th {
-  background-color: #f2f2f2;
+  background-color: #f8f9fa;
   height: 50px;
+  font-weight: 500;
+  color: #495057;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+td {
+  border-right: 1px solid rgba(0, 0, 0, 0.04);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+td:last-child {
+  border-right: none;
+}
+
+tr:last-child td {
+  border-bottom: none;
 }
 
 .course-cell {
-  padding: 4px;
-  border-radius: 4px;
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  right: 5px;
+  bottom: 5px;
+  padding: 12px 10px;
+  border-radius: 8px;
   background-color: var(--bg-color);
-  transition: background-color 0.3s; /* 平滑过渡背景颜色变化 */
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  overflow: hidden;
+}
+
+.course-cell::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background: rgba(0, 0, 0, 0.1);
 }
 
 .course-cell:hover {
-  //background-color: darken(var(--bg-color), 10%); /* 鼠标悬停时加深背景颜色 */
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
   @each $name, $color in $colors {
     &[style*="--bg-color: #{$color}"] {
-      //background-color: darken($color, 10%); /* 鼠标悬停时加深背景颜色 */
-      background-color: color.adjust($color, $lightness: -10%); /* 鼠标悬停时加深背景颜色 */
+      background-color: color.adjust($color, $lightness: -2%, $saturation: 3%);
     }
   }
 }
 
-//td div.has-course:hover {
-//  cursor: pointer;
-//}
+.course-cell p {
+  margin: 0;
+  padding: 3px 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  transition: all 0.2s;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
+.course-cell p:first-child {
+  font-weight: 600;
+  font-size: 1.05rem;
+  margin-bottom: 8px;
+  color: rgba(0, 0, 0, 0.8);
+  letter-spacing: 0.02em;
+  position: relative;
+}
 
+.course-cell p:first-child::after {
+  content: '';
+  display: block;
+  width: 30px;
+  height: 2px;
+  background: rgba(0, 0, 0, 0.1);
+  margin-top: 6px;
+}
+
+.course-cell p:nth-child(2) {
+  font-size: 0.85rem;
+  color: rgba(0, 0, 0, 0.65);
+  font-weight: 500;
+}
+
+.course-cell p:nth-child(3) {
+  font-size: 0.82rem;
+  color: rgba(0, 0, 0, 0.55);
+  margin-top: auto;
+}
+
+// 查询表单美化
+.demo-form-inline {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+
+// 课程详情弹窗
 .course-details-dialog {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(3px);
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .dialog-content {
   background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
+  padding: 2rem;
+  border-radius: 16px;
   text-align: center;
+  min-width: 300px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  transform: translateY(0);
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.dialog-content h3 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  color: #333;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.dialog-content p {
+  margin: 0.6rem 0;
+  color: #666;
+  font-size: 1rem;
 }
 
 .dialog-content button {
-  margin-top: 10px;
-  padding: 8px 16px;
+  margin-top: 1.5rem;
+  padding: 0.7rem 1.2rem;
   border: none;
-  background-color: #007bff;
+  background-color: #2563eb;
   color: #fff;
-  border-radius: 4px;
+  border-radius: 8px;
+  font-weight: 500;
   cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.95rem;
+}
+
+.dialog-content button:first-of-type {
+  background-color: #f3f4f6;
+  color: #4b5563;
 }
 
 .dialog-content button:hover {
-  background-color: #0056b3;
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.btn-outline {
-  background-color: transparent;
-  border: 1px solid #dee2e6;
-  color: #495057;
-  position: relative;
-}
-
-.btn-outline:hover {
-  background-color: #f8f9fa;
-}
-
-.btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px 16px;
-  border-radius: 4px;
-  border: none;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.2s;
-}
-/* 上传区域自定义样式 */
+// 上传区域美化
 .custom-upload {
-  width: 95%;
+  width: 100%;
 }
+
 .upload-area {
-  border: 2px dashed #dee2e6;
-  border-radius: 8px;
-  padding: 30px 20px;
+  border: 2px dashed #e2e8f0;
+  border-radius: 12px;
+  padding: 40px 20px;
   text-align: center;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.25s;
+  background-color: #f8fafc;
+}
+
+.upload-area:hover {
+  border-color: #2563eb;
+  background-color: #f0f7ff;
 }
 
 .el-icon--upload {
-  font-size: 32px !important;
+  font-size: 36px !important;
   color: #3b82f6 !important;
   margin-bottom: 16px;
 }
+
 .file-hint {
-  margin-top: 8px;
-  color: #94a3b8;
-  font-size: 12px;
-}
-.el-upload__text {
+  margin-top: 12px;
   color: #64748b;
+  font-size: 0.85rem;
 }
 
+.el-upload__text {
+  color: #475569;
+
+  em {
+    color: #2563eb;
+    font-style: normal;
+    text-decoration: none;
+    font-weight: 500;
+  }
+}
+
+// 按钮美化
+:deep(.el-button) {
+  border-radius: 8px;
+  font-weight: 500;
+  padding: 10px 16px;
+  transition: all 0.2s;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+  }
+
+  &.el-button--primary {
+    background-color: #2563eb;
+    border-color: #2563eb;
+
+    &:hover {
+      background-color: #1d4ed8;
+      border-color: #1d4ed8;
+    }
+  }
+}
+
+// 输入控件美化
+:deep(.el-select),
+:deep(.el-date-editor),
+:deep(.el-input-number) {
+  .el-input__wrapper {
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  }
+
+  &:hover .el-input__wrapper {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 1px #d1d5db;
+  }
+
+  &.is-focus .el-input__wrapper {
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2), 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+}
+
+// 弹窗美化
+:deep(.el-dialog) {
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+  .el-dialog__header {
+    margin: 0;
+    padding: 20px 24px;
+    border-bottom: 1px solid #f1f5f9;
+
+    .el-dialog__title {
+      font-weight: 600;
+      font-size: 1.25rem;
+      color: #1e293b;
+    }
+  }
+
+  .el-dialog__body {
+    padding: 24px;
+  }
+
+  .el-dialog__footer {
+    padding: 16px 24px;
+    border-top: 1px solid #f1f5f9;
+  }
+}
 </style>

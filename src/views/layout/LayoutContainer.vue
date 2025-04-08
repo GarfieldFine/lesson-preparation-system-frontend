@@ -59,7 +59,7 @@ const handleCommand = async (command) => {
             />
             <span style="color: #696969">智能备课</span>
           </el-menu-item>
-          <el-menu-item index="/app/index">首页</el-menu-item>
+<!--          <el-menu-item index="/app/index">首页</el-menu-item>-->
           <el-menu-item index="/lesson">备课</el-menu-item>
 
           <el-menu-item class="selfInfo">

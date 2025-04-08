@@ -1,10 +1,10 @@
 <script setup>
-
-import { ref, computed,onMounted } from 'vue';
-import { Search, Plus, Clock, Filter } from '@element-plus/icons-vue';
+import { ref, computed, onMounted } from 'vue';
+import { Search, Plus, Clock, Filter, Calendar, Document, Check, Close } from '@element-plus/icons-vue';
 import { lessonPreparationRecordGetGetService } from '@/api/lessonPreparationRecord.js'
 import PopWindow from '@/views/component/PopWindow.vue'
 import { useRouter } from 'vue-router'
+
 const router = useRouter()
 const popWin = ref()
 const lessonPreparationList = ref([]);
@@ -13,11 +13,12 @@ const goLessonPreparationRecordGetGetService = async () => {
   const res = await lessonPreparationRecordGetGetService(1)
   lessonPreparationList.value = res.data
 }
+
 onMounted(async () => {
   await goLessonPreparationRecordGetGetService()
 })
-const searchMessage = ref('')
 
+const searchMessage = ref('')
 const filterVisible = ref(false)
 const filterYear = ref('')
 const filterTerm = ref('')
@@ -67,13 +68,13 @@ const filteredLessons = computed(() => {
 })
 
 const goDetails = (id) => {
-  // 在这里添加跳转到详情页面的逻辑
   router.push(`/lesson/lesson_hour/mylessonpreparationbook/${id}`)
 }
 
 const goCreateLessonPreparation = () => {
   popWin.value.popWindowVisible()
 }
+
 const changeCreated = async () => {
   popWin.value.popWindowUnVisible()
   await goLessonPreparationRecordGetGetService()
@@ -87,53 +88,46 @@ const resetFilters = () => {
 </script>
 
 <template>
-  <div class="page-container">
-    <el-card class="lesson-card">
-      <template #header>
-        <div class="card-header">
-          <div class="search-area">
-            <el-input
-              v-model="searchMessage"
-              class="search-input"
-              placeholder="快速搜索备课"
-              size="large"
-              clearable
-            >
-              <template #prefix>
-                <el-icon><Search /></el-icon>
-              </template>
-            </el-input>
-            <el-button type="primary" :icon="Search" size="large" class="search-btn" @click="goSearch">
-              搜索
-            </el-button>
+  <div class="dashboard-container">
+    <div class="dashboard-header">
+      <div class="header-title">
+        <span class="title-icon"><el-icon><Document /></el-icon></span>
+        <h1>我的课时备课列表</h1>
+      </div>
+      <div class="header-actions">
+        <div class="search-box">
+          <el-input
+            v-model="searchMessage"
+            placeholder="搜索课程名称、班级或时间"
+            clearable
+          >
+            <template #prefix>
+              <el-icon><Search /></el-icon>
+            </template>
+          </el-input>
+        </div>
 
-            <el-popover
-              placement="bottom-start"
-              :width="300"
-              trigger="click"
-              v-model:visible="filterVisible"
-              popper-class="filter-popover"
-            >
-              <template #reference>
-                <el-button
-                  class="filter-btn"
-                  :type="filterYear || filterTerm !== '' || filterStatus !== '' ? 'primary' : 'default'"
-                  size="large"
-                >
-                  <el-icon><Filter /></el-icon>
-                  筛选
-                </el-button>
-              </template>
+        <el-dropdown trigger="click" class="filter-dropdown">
+          <el-button
+            :type="filterYear || filterTerm !== '' || filterStatus !== '' ? 'success' : 'default'"
+            class="filter-button"
+          >
+            <el-icon><Filter /></el-icon>
+            筛选
+            <el-icon class="el-icon--right"><el-icon-arrow-down /></el-icon>
+          </el-button>
 
-              <div class="filter-container">
+          <template #dropdown>
+            <el-dropdown-menu class="custom-dropdown">
+              <div class="filter-panel">
                 <div class="filter-header">
                   <span>筛选条件</span>
                   <el-button type="text" @click="resetFilters">重置</el-button>
                 </div>
 
-                <div class="filter-section">
+                <div class="filter-group">
                   <div class="filter-label">学年</div>
-                  <el-select v-model="filterYear" placeholder="选择年份" clearable>
+                  <el-select v-model="filterYear" placeholder="选择年份" clearable size="small">
                     <el-option
                       v-for="year in years"
                       :key="year"
@@ -143,309 +137,355 @@ const resetFilters = () => {
                   </el-select>
                 </div>
 
-                <div class="filter-section">
+                <div class="filter-group">
                   <div class="filter-label">学期</div>
-                  <el-select v-model="filterTerm" placeholder="选择学期" clearable>
+                  <el-select v-model="filterTerm" placeholder="选择学期" clearable size="small">
                     <el-option label="上半年" value="0" />
                     <el-option label="下半年" value="1" />
                   </el-select>
                 </div>
 
-                <div class="filter-section">
+                <div class="filter-group">
                   <div class="filter-label">状态</div>
-                  <el-select v-model="filterStatus" placeholder="选择状态" clearable>
+                  <el-select v-model="filterStatus" placeholder="选择状态" clearable size="small">
                     <el-option label="进行中" value="1" />
                     <el-option label="已结束" value="0" />
                   </el-select>
                 </div>
               </div>
-            </el-popover>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+
+        <el-button type="success" class="create-button" @click="goCreateLessonPreparation">
+          <el-icon><Plus /></el-icon>
+          创建备课本
+        </el-button>
+      </div>
+    </div>
+
+    <div class="lesson-list">
+      <div v-if="filteredLessons.length === 0" class="empty-state">
+        <el-empty description="没有找到备课记录" :image-size="150">
+          <template #description>
+            <p>暂无备课记录，点击"创建备课本"开始准备课程</p>
+          </template>
+          <el-button type="success" @click="goCreateLessonPreparation">
+            <el-icon><Plus /></el-icon> 创建备课本
+          </el-button>
+        </el-empty>
+      </div>
+
+      <div v-else class="lesson-cards">
+        <div
+          v-for="lesson in filteredLessons"
+          :key="lesson.id"
+          class="lesson-card"
+          @click="goDetails(lesson.id)"
+        >
+          <div class="lesson-status">
+            <div
+              :class="['status-indicator', +lesson.teachingState === 1 ? 'active' : 'completed']"
+            >
+              <el-icon v-if="+lesson.teachingState === 1"><Clock /></el-icon>
+              <el-icon v-else><Check /></el-icon>
+              <span>{{ +lesson.teachingState === 1 ? '进行中' : '已结束' }}</span>
+            </div>
           </div>
 
-          <el-button type="primary" size="large" class="create-btn" @click="goCreateLessonPreparation">
-            <el-icon><Plus /></el-icon>创建备课本
-          </el-button>
-        </div>
-      </template>
-      <div class="app-list-container">
-        <div
-          v-for="lessonPreparation in filteredLessons"
-          :key="lessonPreparation.id"
-          class="app"
-          @click="goDetails(lessonPreparation.id)"
-        >
-          <div class="app-icon-wrapper">
-            <div class="icon-background"></div>
-            <img src="../../../assets/filelogo4.jpg" alt="App Icon" class="app-icon" />
-          </div>
-          <div class="app-content">
-            <div class="app-header">
-              <div class="header-info">
-                <span class="app-year">{{ lessonPreparation.startLessonTime.split('-')[0] }}</span>
-                <span class="app-term">{{ +lessonPreparation.term === 0 ? '上半年' : '下半年'}}</span>
+          <div class="lesson-content">
+            <div class="lesson-title">{{ lesson.courseName }}</div>
+            <div class="lesson-meta">
+              <div class="meta-item">
+                <el-icon><Calendar /></el-icon>
+                <span>{{ lesson.startLessonTime.split('-')[0] }}年 {{ +lesson.term === 0 ? '上半年' : '下半年' }}</span>
               </div>
-              <div class="status-badge" v-if="+lessonPreparation.teachingState === 1">进行中</div>
-              <div class="status-badge1" v-else>已结束</div>
-            </div>
-            <div class="app-course">
-              {{ lessonPreparation.courseName }}
-            </div>
-            <div class="app-footer">
-              <el-icon><Clock /></el-icon>
-              {{ new Date(lessonPreparation.createTime).toLocaleString() }}
+              <div class="meta-item">
+                <el-icon><Clock /></el-icon>
+                <span>{{ new Date(lesson.createTime).toLocaleDateString() }}</span>
+              </div>
             </div>
           </div>
-        </div>
-        <div v-if="filteredLessons.length === 0" class="empty-state">
-          <el-empty description="没有发现备课记录" :image-size="200" />
+
+          <div class="lesson-action">
+            <el-icon class="action-icon"><el-icon-arrow-right /></el-icon>
+          </div>
         </div>
       </div>
-    </el-card>
+    </div>
+
     <pop-window ref="popWin" :isCreated="isCreated" @changeCreated="changeCreated"></pop-window>
   </div>
 </template>
 
 <style lang="scss" scoped>
-.page-container {
-  height: 800px;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e4e7eb 100%);
-  padding: 20px;
+.dashboard-container {
+  min-height: 100vh;
+  padding: 24px;
+  background: linear-gradient(135deg, #f8fcf8 0%, #edf7ed 100%);
+}
+
+.lesson-list {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 }
 
 .lesson-card {
-  height: 770px;
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border: none;
-  overflow: hidden;
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  border-radius: 10px;
+  background: #fafcfa;
+  transition: all 0.3s;
+  cursor: pointer;
+  border-left: 4px solid transparent;
 
-  :deep(.el-card__body) {
-    padding: 24px;
+  &:hover {
+    background: #f5faf5;
+    transform: translateX(4px);
+    border-left-color: #4caf50;
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.08);
   }
 }
-
-.card-header {
+.dashboard-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 10px;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+  background: white;
+  border-radius: 12px;
+  padding: 16px 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 
-  .search-area {
+  .header-title {
     display: flex;
+    align-items: center;
     gap: 12px;
 
-    .search-input {
-      width: 300px;
-      :deep(.el-input__wrapper) {
-        border-radius: 10px;
-        background: rgba(255, 255, 255, 0.8);
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    .title-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      background: #4caf50;
+      border-radius: 8px;
+      color: white;
+      font-size: 20px;
+    }
 
-        &:hover {
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-          background: white;
+    h1 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 600;
+      color: #2c3e50;
+    }
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    .search-box {
+      width: 280px;
+
+      :deep(.el-input__wrapper) {
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s;
+
+        &:hover, &:focus {
+          box-shadow: 0 2px 12px rgba(76, 175, 80, 0.2);
         }
+      }
+
+      :deep(.el-input__prefix) {
+        color: #4caf50;
       }
     }
 
-    .search-btn {
-      border-radius: 10px;
-      background: #409eff;
-      border: none;
-      transition: all 0.3s ease;
-      padding: 0 20px;
+    .filter-button {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 8px;
+      transition: all 0.3s;
 
       &:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
+        box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+      }
+    }
+
+    .create-button {
+      background: #4caf50;
+      border: none;
+      border-radius: 8px;
+      padding: 0 20px;
+      height: 40px;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        background: #43a047;
       }
     }
   }
-
-  .create-btn {
-    background: linear-gradient(45deg, #409eff, #36b4ff);
-    border: none;
-    padding: 0 24px;
-    border-radius: 10px;
-    transition: all 0.3s ease;
-
-    .el-icon {
-      margin-right: 6px;
-    }
-
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
-    }
-  }
 }
 
-.app-list-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 24px;
-  padding: 10px;
-}
-
-.app {
-  background: white;
-  border-radius: 12px;
+.custom-dropdown {
+  padding: 0;
+  border-radius: 8px;
   overflow: hidden;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border: 1px solid rgba(235, 238, 245, 0.6);
-  height: 300px;
-  display: flex;
-  flex-direction: column;
-  position: relative;
+  min-width: 280px;
+}
 
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 12px;
-    background: linear-gradient(45deg, rgba(64, 158, 255, 0.1), transparent);
-    opacity: 0;
-    transition: all 0.3s ease;
-  }
+.filter-panel {
+  padding: 16px;
 
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
-
-    &::after {
-      opacity: 1;
-    }
-
-    .app-icon {
-      transform: scale(1.05);
-    }
-  }
-
-  .app-icon-wrapper {
-    padding: 24px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #f8fafc;
-    position: relative;
-    overflow: hidden;
-
-    &::before {
-      content: '';
-      position: absolute;
-      width: 140%;
-      height: 140%;
-      background: radial-gradient(circle, rgba(64, 158, 255, 0.1) 0%, transparent 70%);
-      top: -20%;
-      left: -20%;
-    }
-
-    .app-icon {
-      width: 100px;
-      height: 100px;
-      object-fit: cover;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-      transition: all 0.3s ease;
-    }
-  }
-
-  .app-content {
-    padding: 20px;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-  }
-
-  .app-header {
+  .filter-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e0e0e0;
 
-    .header-info {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .app-year {
-      font-size: 16px;
+    span {
       font-weight: 600;
-      color: #303133;
+      color: #2c3e50;
     }
+  }
 
-    .app-term {
+  .filter-group {
+    margin-bottom: 12px;
+
+    .filter-label {
       font-size: 13px;
-      color: #606266;
-      background: #f5f7fa;
-      padding: 4px 12px;
-      border-radius: 6px;
+      color: #616161;
+      margin-bottom: 6px;
     }
 
-    .status-badge {
-      background: linear-gradient(45deg, #409eff, #36b4ff);
-      color: white;
-      padding: 4px 12px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 500;
-    }
-    .status-badge1 {
-      //background: linear-gradient(45deg, #ff4d4f, #ff6b6b);
-      background: linear-gradient(45deg, #ffe082, #ffb74d);
-      color: white;
-      padding: 4px 12px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 500;
-    }
-  }
-
-  .app-course {
-    font-size: 14px;
-    color: #606266;
-    line-height: 1.6;
-    flex: 1;
-  }
-
-  .app-footer {
-    font-size: 13px;
-    color: #909399;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-top: 16px;
-    padding-top: 16px;
-    border-top: 1px solid #f0f2f5;
-
-    .el-icon {
-      font-size: 16px;
-      color: #409eff;
-      transition: all 0.3s ease;
-    }
-
-    &:hover .el-icon {
-      transform: scale(1.1);
+    :deep(.el-select) {
+      width: 100%;
     }
   }
 }
 
 .empty-state {
-  grid-column: 1 / -1;
+  padding: 40px 0;
+  text-align: center;
+
+  p {
+    color: #757575;
+    margin-bottom: 16px;
+  }
+}
+
+.lesson-cards {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.lesson-card {
+  display: flex;
   align-items: center;
-  padding: 60px 0;
-  background: rgba(248, 250, 252, 0.8);
-  border-radius: 12px;
-  backdrop-filter: blur(4px);
+  padding: 16px 20px;
+  border-radius: 10px;
+  background: #f9f9f9;
+  transition: all 0.3s;
+  cursor: pointer;
+  border-left: 4px solid transparent;
+
+  &:hover {
+    background: #f1f8e9;
+    transform: translateX(4px);
+    border-left-color: #4caf50;
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.1);
+  }
+
+  .lesson-status {
+    margin-right: 20px;
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+
+      &.active {
+        background: #eef8ef;
+        color: #4caf50;
+      }
+
+      &.completed {
+        background: #fffbf0;
+        color: #ffa000;
+      }
+    }
+  }
+
+  .lesson-content {
+    flex: 1;
+
+    .lesson-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 8px;
+    }
+
+    .lesson-meta {
+      display: flex;
+      gap: 24px;
+
+      .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: #757575;
+        font-size: 13px;
+
+        .el-icon {
+          font-size: 16px;
+          color: #4caf50;
+        }
+      }
+    }
+  }
+
+  .lesson-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #eef8ef;
+    color: #4caf50;
+    transition: all 0.3s;
+
+    .action-icon {
+      font-size: 16px;
+    }
+
+    &:hover {
+      background: #5cb85c;
+      color: white;
+      transform: scale(1.1);
+    }
+  }
 }
 
 ::-webkit-scrollbar {
@@ -458,71 +498,29 @@ const resetFilters = () => {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(45deg, #409eff, #36b4ff);
+  background: linear-gradient(45deg, #6abe6e, #a3d8a5);
   border-radius: 4px;
 
   &:hover {
-    background: linear-gradient(45deg, #36b4ff, #409eff);
+    background: linear-gradient(45deg, #5cb85c, #8bc34a);
   }
 }
 
-.filter-btn {
-  border-radius: 10px;
-  transition: all 0.3s ease;
+.create-button {
+  background: #5cb85c;
+  border: none;
+  border-radius: 8px;
+  padding: 0 20px;
+  height: 40px;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
-  }
-}
-
-:deep(.filter-popover) {
-  padding: 0;
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  border: none;
-}
-
-.filter-container {
-  padding: 16px;
-}
-
-.filter-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid #f0f2f5;
-
-  span {
-    font-weight: 600;
-    color: #303133;
-  }
-}
-
-.filter-section {
-  margin-bottom: 16px;
-
-  .filter-label {
-    font-size: 14px;
-    color: #606266;
-    margin-bottom: 8px;
-  }
-
-  :deep(.el-select) {
-    width: 100%;
-
-    .el-input__wrapper {
-      border-radius: 8px;
-      background: #f8fafc;
-      box-shadow: none;
-      border: 1px solid #e4e7eb;
-
-      &:hover {
-        border-color: #409eff;
-      }
-    }
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+    background: #4caf50;
   }
 }
 </style>

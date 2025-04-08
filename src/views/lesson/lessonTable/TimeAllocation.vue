@@ -59,74 +59,10 @@
               placeholder="请输入教学内容"
               rows="1"
               @input="autoGrow($event.target)"
-              @focus="showInteractionTips($event, phase)"
+              @focus="showInteractionTips($event, phase, index)"
               @blur="hideInteractionTips"
               @click="showEditPanel($event, phase, 'content')"
             ></textarea>
-
-            <!-- 修改互动提示框部分 -->
-            <div v-if="showTips && isInteractionPhase(phase)" class="interaction-tips" :style="tipsPosition">
-              <div class="tips-header">
-                <el-icon><Bell /></el-icon>
-                <span>互动方式建议</span>
-              </div>
-              <div class="tips-content">
-                <div v-for="(tip, tipIndex) in interactionTips"
-                     :key="tipIndex"
-                     class="tip-item"
-                     @click="applyInteractionMethod(tip, phase)"
-                >
-                  <div class="tip-item-content">
-                    <el-icon><Check /></el-icon>
-                    <span>{{ tip }}</span>
-                    <!-- 添加推荐标记 -->
-                    <div v-if="getRecommendedMethod(index)?.name === tip" class="recommendation-badge">
-                      <el-icon><Star /></el-icon>
-                      <span>推荐</span>
-                    </div>
-                  </div>
-                  <!-- 将popover移到外部，防止点击冲突 -->
-                  <el-popover
-                    placement="right"
-                    :width="300"
-                    trigger="hover"
-                    popper-class="method-detail-popover"
-                    :stop-popper-mouse-event="false"
-                  >
-                    <template #reference>
-                      <el-icon class="info-icon" @click.stop><InfoFilled /></el-icon>
-                    </template>
-                    <template #default>
-                      <div class="method-detail-container">
-                        <div class="tips-header">
-                          <span>{{ getMethodDetail(tip).name }}</span>
-                        </div>
-                        <div class="tips-content">
-                          <p>{{ getMethodDetail(tip).content }}</p>
-                          <div class="method-actions">
-                            <el-button type="primary" size="small" @click="applyInteractionMethod(tip, phase)">
-                              应用此互动方式
-                            </el-button>
-                          </div>
-                        </div>
-                      </div>
-                    </template>
-                  </el-popover>
-                </div>
-              </div>
-            </div>
-
-            <!-- 删除旧的互动方式详情提示框，因为现在使用Popover替代 -->
-            <div v-if="false && showDetailTips && currentInteractionDetail"
-                 class="method-detail-tips"
-                 :style="detailTipsPosition">
-              <div class="tips-header">
-                <span>{{ currentInteractionDetail.name }}</span>
-              </div>
-              <div class="tips-content">
-                <p>{{ currentInteractionDetail.content }}</p>
-              </div>
-            </div>
 
             <h4>教学建议</h4>
             <textarea
@@ -215,6 +151,55 @@
         </div>
       </div>
     </div>
+
+    <!-- 将互动提示框移到循环外部 -->
+    <div v-if="showTips && selectedPhase && isInteractionPhase(selectedPhase)"
+         class="interaction-tips"
+         :style="tipsPosition">
+      <div class="tips-header">
+        <el-icon><Bell /></el-icon>
+        <span>互动方式建议</span>
+      </div>
+      <div class="tips-content">
+        <div v-for="(tip, tipIndex) in interactionTips"
+             :key="tipIndex"
+             class="tip-item"
+             @mousedown="applyInteractionMethod(tip, selectedPhase)"
+        >
+          <div class="tip-item-content">
+            <el-icon><Check /></el-icon>
+            <span>{{ tip }}</span>
+            <!-- 添加推荐标记 - 修改获取方法 -->
+            <div v-if="getRecommendedMethod(currentPhaseIndex)?.name === tip" class="recommendation-badge">
+              <el-icon><Star /></el-icon>
+              <span>推荐</span>
+            </div>
+          </div>
+          <!-- 将popover移到外部，防止点击冲突 -->
+          <el-popover
+            placement="right"
+            :width="300"
+            trigger="hover"
+            popper-class="method-detail-popover"
+            :stop-popper-mouse-event="false"
+          >
+            <template #reference>
+              <el-icon class="info-icon" @click.stop><InfoFilled /></el-icon>
+            </template>
+            <template #default>
+              <div class="method-detail-container">
+                <div class="tips-header">
+                  <span>{{ getMethodDetail(tip).name }}</span>
+                </div>
+                <div class="tips-content">
+                  <p>{{ getMethodDetail(tip).content }}</p>
+                </div>
+              </div>
+            </template>
+          </el-popover>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -232,15 +217,6 @@ const teacherScheduleId = useRoute().params.teacherScheduleId
 
 // 互动方式列表 - 改为从后端获取
 const interactionMethods = ref([])
-// 当前显示的互动方式详情
-const currentInteractionDetail = ref(null)
-// 详情提示框位置
-const detailTipsPosition = ref({
-  top: '0px',
-  left: '0px'
-})
-// 是否显示详情提示框
-const showDetailTips = ref(false)
 
 // 获取互动方式列表
 const fetchInteractionMethods = async () => {
@@ -295,34 +271,44 @@ const getMethodDetail = (methodName) => {
   return method || { name: methodName, content: '暂无详细说明' }
 }
 
-// 应用互动方式到当前内容
-const applyInteractionMethod = (methodName, phase) => {
-  const method = getMethodDetail(methodName)
+// 添加当前阶段索引
+const currentPhaseIndex = ref(null)
 
-  console.log('应用互动方式:', methodName, '到阶段:', phase.name)
+// 修改显示互动提示的方法
+const showInteractionTips = (event, phase, index) => {
+  if (isInteractionPhase(phase)) {
+    const rect = event.target.getBoundingClientRect()
+    tipsPosition.value = {
+      top: `${rect.top}px`,
+      left: `${rect.right - 70}px` // 将提示框往左移动
+    }
+    showTips.value = true
+    selectedPhase.value = phase
+    currentPhaseIndex.value = index // 保存当前索引
+  }
+}
+
+// 隐藏互动提示
+const hideInteractionTips = () => {
+  // 延迟隐藏，防止点击事件冲突
+  setTimeout(() => {
+    if (!isInteractingWithTips.value) {
+      showTips.value = false
+    }
+  }, 100)
+}
+
+// 添加一个标志来跟踪用户是否正在与提示框交互
+const isInteractingWithTips = ref(false)
+
+// 修改应用互动方式的方法
+const applyInteractionMethod = (methodName, phase) => {
+  if (!phase) return
+
+  const method = getMethodDetail(methodName)
 
   // 直接替换内容
   phase.content = method.content
-
-  // 如果当前没有编辑面板，则打开一个
-  if (!showEditPanelFlag.value || selectedPhase.value !== phase) {
-    selectedPhase.value = phase
-    editingType.value = 'content'
-    showEditPanelFlag.value = true
-
-    // 设置编辑面板位置
-    nextTick(() => {
-      const phaseIndex = currentSubject.value.phases.indexOf(phase)
-      const phaseEl = document.querySelector(`.timeline-item:nth-child(${phaseIndex + 1})`)
-      if (phaseEl) {
-        const rect = phaseEl.getBoundingClientRect()
-        editPanelPosition.value = {
-          top: `${rect.bottom + 5}px`,
-          left: `${rect.left}px`
-        }
-      }
-    })
-  }
 
   // 关闭互动提示框
   showTips.value = false
@@ -499,23 +485,6 @@ const tipsPosition = ref({
 // 判断是否是互动环节
 const isInteractionPhase = (phase) => {
   return phase.name.startsWith('互动')
-}
-
-// 显示互动提示
-const showInteractionTips = (event, phase) => {
-  if (isInteractionPhase(phase)) {
-    const rect = event.target.getBoundingClientRect()
-    tipsPosition.value = {
-      top: `${rect.top}px`,
-      left: `${rect.right - 70}px` // 将提示框往左移动
-    }
-    showTips.value = true
-  }
-}
-
-// 隐藏互动提示
-const hideInteractionTips = () => {
-  showTips.value = false
 }
 
 // 添加编辑面板相关的响应式变量
@@ -1310,17 +1279,97 @@ input:focus, textarea:focus {
 /* 自定义Popover样式 */
 :deep(.method-detail-popover) {
   padding: 0;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.15);
+  border: none;
+  overflow: hidden;
+  transform-origin: center top;
+  animation: popoverFadeIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-:deep(.method-detail-popover .el-popover__title) {
-  margin: 0;
-  padding: 12px 16px;
-  background: #67c23a;
+@keyframes popoverFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 美化标题区域 */
+.method-detail-container .tips-header {
+  background: linear-gradient(135deg, #3f87eb, #1976d2);
   color: white;
-  font-size: 15px;
+  padding: 14px 18px;
+  font-size: 16px;
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 美化内容区域 */
+.method-detail-container .tips-content {
+  padding: 16px 20px;
+  background-color: #fcfcfc;
+}
+
+.method-detail-container .tips-content p {
+  margin: 0;
+  line-height: 1.8;
+  color: #4a4a4a;
+  font-size: 14px;
+  white-space: pre-line;
+  max-height: 200px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+/* 美化滚动条 */
+.method-detail-container .tips-content p::-webkit-scrollbar {
+  width: 4px;
+}
+
+.method-detail-container .tips-content p::-webkit-scrollbar-thumb {
+  background-color: #c0c4cc;
+  border-radius: 2px;
+}
+
+.method-detail-container .tips-content p::-webkit-scrollbar-track {
+  background-color: #f5f7fa;
+}
+
+/* 美化 icon 图标 */
+.info-icon {
+  color: #8c8c8c;
+  cursor: pointer;
+  margin-left: 4px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  z-index: 2;
+  background-color: rgba(240, 240, 240, 0.6);
+  border-radius: 50%;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.info-icon:hover {
+  color: #1976d2;
+  background-color: rgba(25, 118, 210, 0.1);
+  transform: scale(1.1);
+}
+
+/* 为方法容器添加卡片效果 */
+.method-detail-container {
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: white;
+  transition: all 0.3s ease;
 }
 
 /* 添加方法操作按钮区域样式 */

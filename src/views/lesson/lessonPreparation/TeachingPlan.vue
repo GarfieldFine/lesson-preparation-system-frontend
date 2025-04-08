@@ -13,6 +13,9 @@
           <el-button type="success" @click="exportToWord">
             <i class="el-icon-document"></i> 导出为Word
           </el-button>
+          <el-button type="warning" @click="generateAITeachingPlan">
+            <i class="el-icon-magic-stick"></i> 使用AI生成教案
+          </el-button>
         </div>
       </div>
     </div>
@@ -112,26 +115,27 @@ import { ElMessage } from 'element-plus'
 import html2pdf from 'html2pdf.js'
 import { saveAs } from 'file-saver'
 import mammoth from 'mammoth'
-
+import { chapterLessonPreparationAiGenerateTeachingPlanService } from '@/api/chapterLessonPreparation.js'
+import { useRoute } from 'vue-router'
+const chapterLessonPreparationId = useRoute().params.chapterLessonPreparationId
 // 简化后的表格数据，更易于后端返回
-const rawTableData = reactive([
+const rawTableData = ref([
   { id: 0, type: '', title: '', content: '****大学' },
-  { id: 0.1, type: '', title: '', content: '教研室：****     教师姓名：****' },
+  { id: -1, type: '', title: '', content: '教研室：****     教师姓名：****' },
   { id: 1, type: '授课专业年级班级', title: '', content: '' },
   { id: 2, type: '课程名称', title: '', content: 'JavaEE 应用与开发' },
-  { id: 3, type: '授课内容', title: '章节（单元、专题）', content: '第一章 Java Web 开发环境配置' },
-  { id: 4, type: '授课内容', title: '内容', content: '1.1 Java EE 发展历史\n1.2 B/S 模式\n1.3 开发环境的搭建\n1.4 开发工具\n1.5 第一个网站\n1.6 如何学习 Java EE' },
-  { id: 5, type: '授课学时', title: '', content: '理论学时    2' },
-  { id: 6, type: '教学目的与要求', title: '', content: '1、了解 web 开发的发展历程\n2、Java EE 运行环境的建立\n3、第一个 Java EE 网站的搭建' },
-  { id: 7, type: '教学重点与难点', title: '', content: '1、Java EE 运行环境的建立\n2、第一个 Java EE 网站的搭建' },
+  { id: 3, type: '授课内容', title: '章节（单元、专题）', content: '' },
+  { id: 4, type: '授课内容', title: '内容', content: '' },
+  { id: 5, type: '授课学时', title: '', content: '理论学时    ' },
+  { id: 6, type: '教学目的与要求', title: '', content: '' },
+  { id: 7, type: '教学重点与难点', title: '', content: '' },
   { id: 8, type: '教学方法与手段', title: '1、以讲授、演示为主', content: '' },
   { id: 9, type: '教学方法与手段', title: '2、教具：无', content: '' },
-  { id: 10, type: '教学方法与手段', title: '3、多媒体', content: '课件来源：自制', multimedia: '使用章节：本节', hours: '学时：2' },
-  { id: 11, type: '教学内容', title: '', content: '1. Web 开发的发展历史（10分钟）\n2. B/S 模式运行原理（10分钟）\n3. Java EE 运行环境的安装与配置（40分钟）\n4. 例子的演示（5分钟）\n5. 第一个 Java EE 网站的搭建（20分钟）\n6. 如何学习 Java EE（5分钟）' },
-  { id: 17, type: '作业安排', title: '', content: '习题：上机自己配置 Java EE 运行环境并运行一个例子' },
-  { id: 18, type: '讲课提纲与板书设计（或电子教案）', title: '', content: '课堂教学使用电子教案' }
+  { id: 10, type: '教学方法与手段', title: '3、多媒体', content: '课件来源：', multimedia: '使用章节：', hours: '学时：' },
+  { id: 11, type: '教学内容', title: '', content: '' },
+  { id: 17, type: '作业安排', title: '', content: '习题：' },
+  { id: 18, type: '讲课提纲与板书设计（或电子教案）', title: '', content: '' }
 ])
-
 // 配置映射函数，根据行的特征添加配置项
 const processTableData = (data) => {
   return data.map(row => {
@@ -144,7 +148,7 @@ const processTableData = (data) => {
     }
 
     // 部门信息行
-    else if (row.id === 0.1) {
+    else if (row.id === -1) {
       processedRow.isDepartmentInfo = true;
       processedRow.span = true;
     }
@@ -169,7 +173,7 @@ const processTableData = (data) => {
 };
 
 // 处理后的表格数据，用于实际渲染
-const tableData = computed(() => processTableData(rawTableData));
+const tableData = computed(() => processTableData(rawTableData.value));
 
 // 控制表格单元格合并
 const objectSpanMethod = ({ row, column, rowIndex, columnIndex }) => {
@@ -249,7 +253,7 @@ const openEditDialog = (row, index) => {
 const saveEdit = () => {
   if (currentEditIndex.value !== null) {
     // 只更新原始数据中的内容字段
-    const updatedData = { ...rawTableData[currentEditIndex.value] };
+    const updatedData = { ...rawTableData.value[currentEditIndex.value] };
 
     // 更新基本字段
     updatedData.type = currentEditItem.value.type;
@@ -263,7 +267,7 @@ const saveEdit = () => {
     }
 
     // 应用更新
-    Object.assign(rawTableData[currentEditIndex.value], updatedData);
+    Object.assign(rawTableData.value[currentEditIndex.value], updatedData);
     dialogVisible.value = false;
     ElMessage.success('内容已更新');
   }
@@ -299,6 +303,26 @@ const exportToWord = () => {
 
   saveAs(blob, '教学计划表.doc')
   ElMessage.success('Word导出成功')
+}
+
+// AI生成教案
+const generateAITeachingPlan = async () => {
+  // 这里可以添加调用AI接口生成教案的逻辑
+  ElMessage({
+    type: 'info',
+    message: 'AI正在生成教案，请稍候...',
+    duration: 2000,
+  })
+  const loading = ElLoading.service({
+    lock: true,
+    text: '正在进行教案生成...',
+    background: 'rgba(255, 255, 255, 0.7)',
+  })
+  const res = await chapterLessonPreparationAiGenerateTeachingPlanService(chapterLessonPreparationId)
+  rawTableData.value = res.data
+  loading.close()
+  ElMessage.success('教案生成成功！')
+  // 更新教案内容的逻辑可以在这里实现
 }
 
 // 为表格添加点击事件
@@ -380,6 +404,7 @@ onMounted(() => {
 .department-info {
   font-size: 14px;
 }
+
 .header-content {
   display: flex;
   justify-content: space-between;
@@ -420,6 +445,18 @@ onMounted(() => {
   font-weight: 500;
   transition: all 0.3s;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+}
+
+/* 添加AI生成按钮样式 */
+:deep(.el-button--warning) {
+  background-color: #e6a23c;
+  border-color: #e6a23c;
+  color: #ffffff;
+}
+
+:deep(.el-button--warning:hover) {
+  background-color: #ebb563;
+  border-color: #ebb563;
 }
 
 /* 表格容器样式 */

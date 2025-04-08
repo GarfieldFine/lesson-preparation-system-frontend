@@ -128,3 +128,9 @@ export const chapterLessonPreparationAiReviseTeachingContentService = (teachingC
     userRequest
   })
 }
+
+
+// ai生成教案
+export const chapterLessonPreparationAiGenerateTeachingPlanService = (chapterLessonPreparationId) => {
+  return request.post(`/chapterLessonPreparation/ai/generateTeachingPlan/${chapterLessonPreparationId}`)
+}

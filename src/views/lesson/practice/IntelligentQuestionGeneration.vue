@@ -197,9 +197,9 @@
       </div>
 
       <div class="generation-actions">
-        <el-button class="custom-btn btn-secondary">
-          <i class="fas fa-magic"></i> 生成并发布
-        </el-button>
+<!--        <el-button class="custom-btn btn-secondary">-->
+<!--          <i class="fas fa-magic"></i> 生成并发布-->
+<!--        </el-button>-->
         <el-button type="primary" class="custom-btn btn-primary" @click="generateQuestions">
           <i class="fas fa-bolt"></i> 开始生成
         </el-button>

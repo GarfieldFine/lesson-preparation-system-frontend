@@ -76,9 +76,9 @@ watch(isRegister,()=>{
     <el-row>
       <el-col :span="12" :offset="6">
         <div class="headLogo">
-<!--          <img src="@/assets/headlogo.png" alt="" />-->
-          <img src="@/assets/AIquestionLogo.jpg" alt="" />
-          <h3>AI应用问答中心</h3>
+<!--          <img src="@/assets/img.png" alt="" />-->
+          <img src="@/assets/img.png" alt="" />
+          <h3>教师备课系统</h3>
           <div class="lab">
             <p>致力于网站开发</p>
           </div>

@@ -107,3 +107,19 @@ export const lessonHourPreparationAiReviseTeachingContentService = (teachingCont
 export const aiGenerateInteractionMethodsService = (teacherScheduleId) => {
   return request.post(`/LessonHourPreparation/ai/generate/interactionMethods/${teacherScheduleId}`)
 }
+
+// ai生成全部大致内容
+export const OverallAiGenerationService = (overallAiGenerationDto) => {
+  return request.post('/LessonHourPreparation/ai/overall/generate',overallAiGenerationDto)
+}
+
+
+// ai生成全部大致内容
+export const aiGenerationApproximateTeachingContentService = (teacherScheduleId) => {
+  return request.post(`/LessonHourPreparation/ai/approximate/teachingContent/${teacherScheduleId}`)
+}
+
+// ai生成全部大致内容
+export const aiGenerationApproximateExpectedResultService = (teacherScheduleId) => {
+  return request.post(`/LessonHourPreparation/ai/approximate/expectedResult/${teacherScheduleId}`)
+}
