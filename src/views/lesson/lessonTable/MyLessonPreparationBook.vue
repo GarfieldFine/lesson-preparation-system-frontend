@@ -1,9 +1,14 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { teacherScheduleGetListByLessonPreparationRecIdService } from '@/api/teacherSchedule.js'
-import { lessonPreparationRecordGetClassNameService, lessonPreparationRecordAddClassService } from '@/api/lessonPreparationRecord.js'
+import {
+  lessonPreparationRecordGetClassNameService,
+  lessonPreparationRecordAddClassService,
+  getLessonPreparationRecordByIdService
+} from '@/api/lessonPreparationRecord.js'
 import { classGetAllNameService } from '@/api/class.js'
 import { useRoute, useRouter } from 'vue-router'
+import { chapterLessonPreparationGetListByLessonPreparationRecordIdService } from '@/api/chapterLessonPreparation.js'
 
 const router = useRouter()
 const LessonPreparationRecId = useRoute().params.lessonPreparationBookId
@@ -14,6 +19,9 @@ const dialogFormVisible = ref(false)
 const classId = ref('')
 const activeCategory = ref(null) // 添加当前激活的分类状态
 const hoverTimer = ref(null) // 添加悬停计时器
+const isFinish = ref(1)
+const teachingPlanDialogVisible = ref(false) // 教案章节列表弹窗显示状态
+const chapterList = ref([]) // 教案章节列表
 
 onMounted(async () => {
   const res = await teacherScheduleGetListByLessonPreparationRecIdService(LessonPreparationRecId)
@@ -24,7 +32,10 @@ onMounted(async () => {
   const res2 = await classGetAllNameService()
   classList.value = res2.data
   // console.log(res1)
-
+  const res3 = await getLessonPreparationRecordByIdService(LessonPreparationRecId)
+  isFinish.value = res3.data.teachingState
+  const res4 = await chapterLessonPreparationGetListByLessonPreparationRecordIdService(LessonPreparationRecId)
+  chapterList.value = res4.data
 })
 
 // 使用计算属性将数组转换成字符串
@@ -137,12 +148,25 @@ const goToTeachingCalendar = () => {
   router.push(`/lesson/teachingCalendar/${LessonPreparationRecId}`)
 }
 
-// const goToTeachingPlan = () => {
-// // 这里是跳转到教案生成页面的逻辑
-//   console.log('跳转到教案生成页面')
-// // 实际实现可以使用 router.push 进行路由跳转
-//   router.push(`/lesson/teachingPlan/${LessonPreparationRecId}`)
-// }
+// 打开教案章节列表弹窗
+const openTeachingPlanDialog = () => {
+  chapterList.value = [
+    { id: 1, chapterName: '第一章：课程介绍', createTime: '2023-09-01' },
+    { id: 2, chapterName: '第二章：基础知识', createTime: '2023-09-05' },
+    { id: 3, chapterName: '第三章：进阶内容', createTime: '2023-09-10' }
+  ]
+  teachingPlanDialogVisible.value = true
+}
+
+// 跳转到教案详情页面
+const goToTeachingPlan = (chapterId) => {
+  // 这里是跳转到教案生成页面的逻辑
+  console.log('跳转到教案生成页面', chapterId)
+  // 实际实现可以使用 router.push 进行路由跳转
+  router.push(`/lesson/teachingPlan/${LessonPreparationRecId}`)
+  teachingPlanDialogVisible.value = false
+}
+
 </script>
 
 <template>
@@ -182,9 +206,9 @@ const goToTeachingCalendar = () => {
           <el-button type="primary" class="teaching-tool-button" @click="goToTeachingCalendar">
             <i class="el-icon-date"></i> 教学日历
           </el-button>
-<!--          <el-button type="success" class="teaching-tool-button" @click="goToTeachingPlan">-->
-<!--            <i class="el-icon-document"></i> 教案生成-->
-<!--          </el-button>-->
+          <el-button v-if="isFinish === 0" type="success" class="teaching-tool-button" @click="openTeachingPlanDialog">
+            <i class="el-icon-document"></i> 教案
+          </el-button>
           <el-button type="primary" class="add-class-button" @click="dialogFormVisible = true">
             <i class="el-icon-plus"></i> 添加班级
           </el-button>
@@ -296,7 +320,7 @@ const goToTeachingCalendar = () => {
     :show-close="true"
   >
     <div class="dialog-body">
-      <p class="dialog-description">从下方选择一个班级添加到备本能中</p>
+      <p class="dialog-description">从下方选择一个班级添加到备本中</p>
       <el-select v-model="classId" placeholder="选择要添加的班级" class="class-select">
         <el-option
           v-for="cl in classList"
@@ -319,6 +343,48 @@ const goToTeachingCalendar = () => {
         </el-button>
       </div>
     </template>
+  </el-dialog>
+
+  <!-- 教案章节列表弹窗 -->
+  <el-dialog
+    v-model="teachingPlanDialogVisible"
+    title="选择教案章节"
+    width="600px"
+    custom-class="chapter-dialog"
+    :show-close="true"
+    :close-on-click-modal="false"
+  >
+    <div class="dialog-body chapter-list-container">
+      <p class="dialog-description">请选择要查看的教案章节</p>
+
+      <div class="chapter-list">
+        <div
+          v-for="chapter in chapterList"
+          :key="chapter.id"
+          class="chapter-item"
+          @click="goToTeachingPlan(chapter.id)"
+        >
+          <div class="chapter-icon">
+            <i class="el-icon-document"></i>
+          </div>
+          <div class="chapter-info">
+            <h3 class="chapter-title">{{ chapter.chapterName }}</h3>
+            <p class="chapter-date">创建于: {{ chapter.createTime }}</p>
+          </div>
+          <div class="chapter-action">
+            <i class="el-icon-right"></i>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="chapterList.length === 0" class="empty-chapter-list">
+        <div class="empty-icon">
+          <i class="el-icon-document"></i>
+        </div>
+        <p class="empty-text">暂无教案章节</p>
+        <p class="empty-subtext">请先创建教案章节</p>
+      </div>
+    </div>
   </el-dialog>
 </template>
 
@@ -353,6 +419,186 @@ const goToTeachingCalendar = () => {
 
   i {
     margin-right: 0.5rem;
+  }
+}
+
+// 教案章节列表样式
+.chapter-dialog {
+  :deep(.el-dialog__header) {
+    background: linear-gradient(135deg, #3b82f6, #6366f1);
+    position: relative;
+    overflow: hidden;
+
+    &:before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 60%);
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .el-dialog__title {
+      font-size: 1.25rem;
+      letter-spacing: 0.5px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+  }
+
+  .dialog-body {
+    padding: 0;
+  }
+
+  .chapter-list-container {
+    padding: 1.75rem;
+    background: linear-gradient(145deg, #ffffff, #f9fafc);
+  }
+
+  .dialog-description {
+    margin-bottom: 1.75rem;
+    color: #64748b;
+    font-size: 1rem;
+    text-align: center;
+    position: relative;
+    padding-bottom: 1rem;
+
+    &:after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 3px;
+      background: linear-gradient(to right, #3b82f6, #6366f1);
+      border-radius: 3px;
+    }
+  }
+
+  .chapter-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .chapter-item {
+    display: flex;
+    align-items: center;
+    padding: 1.25rem;
+    background: #f8fafc;
+    border-radius: 16px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    position: relative;
+    overflow: hidden;
+
+    &:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: linear-gradient(to bottom, #3b82f6, #6366f1);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    &:hover {
+      background: #f0f5ff;
+      transform: translateY(-4px);
+      box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.15), 0 8px 10px -6px rgba(59, 130, 246, 0.1);
+      border-color: rgba(191, 219, 254, 0.6);
+
+      &:before {
+        opacity: 1;
+      }
+    }
+  }
+
+  .chapter-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    color: #3b82f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1.25rem;
+    font-size: 1.5rem;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+    transition: all 0.3s ease;
+
+    .chapter-item:hover & {
+      transform: scale(1.1);
+      background: linear-gradient(135deg, #bfdbfe 0%, #93c5fd 100%);
+      box-shadow: 0 8px 16px rgba(59, 130, 246, 0.2);
+    }
+  }
+
+  .chapter-info {
+    flex: 1;
+    transition: transform 0.3s ease;
+
+    .chapter-item:hover & {
+      transform: translateX(4px);
+    }
+  }
+
+  .chapter-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0 0 0.375rem 0;
+    transition: color 0.3s ease;
+
+    .chapter-item:hover & {
+      color: #3b82f6;
+    }
+  }
+
+  .chapter-date {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin: 0;
+    display: flex;
+    align-items: center;
+
+    &:before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: #6366f1;
+      margin-right: 0.5rem;
+      opacity: 0.7;
+    }
+  }
+
+  .chapter-action {
+    color: #64748b;
+    font-size: 1.25rem;
+    transition: all 0.3s ease;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(241, 245, 249, 0.8);
+
+    .chapter-item:hover & {
+      color: white;
+      background: linear-gradient(135deg, #3b82f6, #6366f1);
+      transform: translateX(4px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+    }
   }
 }
 
@@ -855,24 +1101,67 @@ const goToTeachingCalendar = () => {
 .modern-dialog {
   border-radius: 16px;
   overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(8px);
+  transform: translateZ(0);
+
+  @keyframes dialogFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  animation: dialogFadeIn 0.3s ease-out;
 
   :deep(.el-dialog__header) {
     background: linear-gradient(to right, #3b82f6, #6366f1);
     padding: 1.25rem 1.5rem;
     margin-right: 0;
+    position: relative;
+    overflow: hidden;
+
+    &:before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 100%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%);
+      opacity: 0.6;
+      pointer-events: none;
+    }
 
     .el-dialog__title {
       color: white;
-      font-size: 1.125rem;
+      font-size: 1.25rem;
       font-weight: 600;
+      letter-spacing: 0.5px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
     .el-dialog__headerbtn {
       top: 1.25rem;
       right: 1.5rem;
+      transition: all 0.2s ease;
+
+      &:hover {
+        transform: rotate(90deg);
+      }
 
       .el-dialog__close {
         color: white;
+        font-size: 1.25rem;
+        transition: all 0.2s ease;
+
+        &:hover {
+          opacity: 0.8;
+        }
       }
     }
   }
@@ -883,18 +1172,28 @@ const goToTeachingCalendar = () => {
 
   .dialog-body {
     .dialog-description {
-      margin: 0 0 1.25rem 0;
+      margin: 0 0 1.5rem 0;
       color: #64748b;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
+      line-height: 1.5;
     }
 
     .class-select {
       width: 100%;
 
       :deep(.el-input__wrapper) {
-        border-radius: 10px;
+        border-radius: 12px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        padding: 0.5rem 1rem;
+        padding: 0.625rem 1rem;
+        transition: all 0.3s ease;
+
+        &:hover {
+          box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+        }
+
+        &.is-focus {
+          box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2), 0 4px 12px rgba(59, 130, 246, 0.1);
+        }
       }
     }
 
@@ -904,7 +1203,8 @@ const goToTeachingCalendar = () => {
 
       .option-icon {
         color: #3b82f6;
-        margin-right: 0.5rem;
+        margin-right: 0.75rem;
+        font-size: 1.125rem;
       }
     }
   }
@@ -912,21 +1212,27 @@ const goToTeachingCalendar = () => {
   :deep(.el-dialog__footer) {
     border-top: 1px solid #f1f5f9;
     padding: 1.25rem 1.5rem;
+    background: #f8fafc;
   }
 
   .dialog-footer {
     display: flex;
     justify-content: flex-end;
-    gap: 0.75rem;
+    gap: 1rem;
 
     .cancel-button {
       border: 1px solid #e2e8f0;
       color: #64748b;
       background: transparent;
+      border-radius: 10px;
+      padding: 0.625rem 1.25rem;
+      transition: all 0.3s ease;
 
       &:hover {
         border-color: #cbd5e1;
         color: #475569;
+        background: #f1f5f9;
+        transform: translateY(-2px);
       }
     }
 
@@ -934,6 +1240,9 @@ const goToTeachingCalendar = () => {
       background: linear-gradient(to right, #3b82f6, #6366f1);
       border: none;
       box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+      border-radius: 10px;
+      padding: 0.625rem 1.5rem;
+      transition: all 0.3s ease;
 
       &:hover:not(:disabled) {
         background: linear-gradient(to right, #2563eb, #4f46e5);
@@ -945,9 +1254,196 @@ const goToTeachingCalendar = () => {
         background: #94a3b8;
         box-shadow: none;
         cursor: not-allowed;
+        opacity: 0.7;
       }
+    }
+  }
+
+  // 空状态样式
+  .empty-chapter-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px dashed #cbd5e1;
+
+    .empty-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+      color: #3b82f6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.25rem;
+      font-size: 2rem;
+      box-shadow: 0 8px 16px rgba(59, 130, 246, 0.15);
+    }
+
+    .empty-text {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: #1e293b;
+      margin: 0 0 0.5rem 0;
+    }
+
+    .empty-subtext {
+      font-size: 0.95rem;
+      color: #64748b;
+      margin: 0;
     }
   }
 }
 </style>
 
+<!-- 添加全局样式 -->
+<style lang="scss">
+.chapter-dialog {
+  border-radius: 16px !important;
+  overflow: hidden;
+
+  .el-dialog__header {
+    background: linear-gradient(135deg, #3b82f6, #6366f1) !important;
+    margin-right: 0 !important;
+
+    .el-dialog__title {
+      color: white !important;
+      font-weight: 600;
+    }
+
+    .el-dialog__headerbtn {
+      .el-dialog__close {
+        color: white !important;
+        font-size: 18px;
+      }
+
+      &:hover {
+        .el-dialog__close {
+          color: rgba(255,255,255,0.8) !important;
+        }
+      }
+    }
+  }
+
+  .el-dialog__body {
+    padding: 0 !important;
+  }
+}
+
+/* 弹窗内容区样式 */
+.chapter-list-container {
+  padding: 24px;
+
+  .dialog-description {
+    margin-bottom: 24px;
+    color: #64748b;
+    text-align: center;
+    position: relative;
+    padding-bottom: 12px;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 2px;
+      background: #3b82f6;
+    }
+  }
+
+  .chapter-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .chapter-item {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: 1px solid #e2e8f0;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+      border-color: #3b82f6;
+
+      .chapter-action {
+        color: #3b82f6;
+        transform: translateX(4px);
+      }
+    }
+  }
+
+  .chapter-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: #dbeafe;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 16px;
+
+    i {
+      color: #3b82f6;
+      font-size: 20px;
+    }
+  }
+
+  .chapter-info {
+    flex: 1;
+
+    .chapter-title {
+      margin: 0;
+      font-size: 16px;
+      color: #1e293b;
+    }
+
+    .chapter-date {
+      margin: 4px 0 0;
+      font-size: 12px;
+      color: #64748b;
+    }
+  }
+
+  .chapter-action {
+    color: #94a3b8;
+    transition: all 0.3s;
+  }
+
+  .empty-chapter-list {
+    text-align: center;
+    padding: 40px 0;
+
+    .empty-icon {
+      i {
+        font-size: 48px;
+        color: #cbd5e1;
+      }
+    }
+
+    .empty-text {
+      color: #64748b;
+      margin: 16px 0 8px;
+    }
+
+    .empty-subtext {
+      color: #94a3b8;
+      font-size: 12px;
+      margin: 0;
+    }
+  }
+}
+</style>

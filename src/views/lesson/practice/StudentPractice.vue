@@ -222,7 +222,7 @@ import { submitPracticeAnswerService } from '@/api/studentPracticeRecord.js'
 
 const router = useRouter()
 const route = useRoute()
-const practiceId = route.params.practiceId
+const practiceId = route.params.practiceGroupId
 
 const currentQuestionIndex = ref(0)
 const userAnswers = ref([])
@@ -236,7 +236,7 @@ const currentQuestion = computed(() => {
 // 模拟练习数据
 const practiceData = ref({
   id: practiceId,
-  title: '第一章 函数与导数 - 练习题',
+  title: '第一章 函数与导数',
   questions: []
 })
 
@@ -394,7 +394,7 @@ const beforeRouteLeave = async (to, from, next) => {
 
 onMounted(async () => {
   // 实际项目中，这里会从API获取练习数据
-  const res = await getQuestionsByAssessmentQuestionGroupsId(7)
+  const res = await getQuestionsByAssessmentQuestionGroupsId(practiceId)
   console.log(res)
   practiceData.value = res.data
 
@@ -417,7 +417,7 @@ defineExpose({
 
 const submitAnswers = async () => {
   // 直接提交答案数组，不需要转换格式
-  await submitPracticeAnswerService(7, JSON.stringify(userAnswers.value))
+  await submitPracticeAnswerService(practiceId, JSON.stringify(userAnswers.value))
   ElMessage.success('提交成功')
 }
 </script>

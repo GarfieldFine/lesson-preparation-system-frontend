@@ -6,6 +6,18 @@
       <div class="title-decoration"></div>
     </div>
 
+    <!-- 课程信息卡片 -->
+    <div class="course-info-card">
+      <div class="course-info-item">
+        <span class="info-label">课程名称：</span>
+        <span class="info-value">{{ courseInfo.courseName }}</span>
+      </div>
+      <div class="course-info-item">
+        <span class="info-label">上课时间：</span>
+        <span class="info-value">{{ courseInfo.lessonTime }}</span>
+      </div>
+    </div>
+
     <!-- 匿名提示 -->
     <el-alert
       title="本次反馈为匿名反馈，请按实情填写，帮助老师及时调整教学方法，提升课堂质量"
@@ -112,7 +124,7 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter,useRoute } from 'vue-router'
 import { CircleCheckFilled } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { addStudentPostLessonFeedbackService } from '@/api/feedback.js'
@@ -121,6 +133,12 @@ const router = useRouter()
 const feedbackFormRef = ref(null)
 const submitting = ref(false)
 const dialogVisible = ref(false)
+const teacherScheduleId = useRoute().params.teacherScheduleId
+// 课程信息（假数据，实际应从API获取）
+const courseInfo = ref({
+  courseName: '高等数学（上）',
+  lessonTime: '2023-10-15 08:00-09:40'
+})
 
 // 满意度选项
 const satisfactionOptions = [
@@ -203,6 +221,7 @@ const submitFeedback = async () => {
 
 // 页面加载动画效果
 onMounted(() => {
+
   // 初始化页面时可以添加一些额外的动画效果
 })
 </script>
@@ -241,6 +260,37 @@ onMounted(() => {
   width: 80px;
   background: linear-gradient(90deg, transparent, #409EFF, transparent);
   margin: 0 auto;
+}
+
+/* 课程信息卡片样式 */
+.course-info-card {
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  padding: 15px 20px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border-left: 3px solid #409EFF;
+}
+
+.course-info-item {
+  display: flex;
+  align-items: center;
+  margin: 5px 0;
+}
+
+.info-label {
+  font-size: 14px;
+  color: #606266;
+  margin-right: 8px;
+}
+
+.info-value {
+  font-size: 15px;
+  color: #303133;
+  font-weight: 500;
 }
 
 .anonymous-alert {

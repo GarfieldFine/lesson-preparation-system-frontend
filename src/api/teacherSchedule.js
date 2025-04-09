@@ -29,6 +29,9 @@ export const teacherScheduleReassignmentService = (id, {classTimeStart, classroo
   })
 }
 
+export const ImportClassScheduleService = (fd) => {
+  return request.post(`/TeacherSchedule/import/classSchedule`, fd)
+}
 
 
 
