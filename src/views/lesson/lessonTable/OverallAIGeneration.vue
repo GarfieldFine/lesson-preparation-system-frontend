@@ -173,6 +173,21 @@
             :rows="4"
             placeholder="请输入本节课的主要教学内容..."
           />
+          <!-- 备选教学方案 -->
+          <div v-if="teachContents.length > 0" class="alternative-results">
+            <h3>备选方案</h3>
+            <div class="alternatives-container">
+              <div
+                v-for="(teachContent, index) in teachContents"
+                :key="index"
+                class="alternative-item"
+                @click="selectTeachContent(teachContent, index)"
+              >
+                <p>方案 {{ index + 1 }}</p>
+                <div class="alternative-content">{{ teachContent }}</div>
+              </div>
+            </div>
+          </div>
           <div class="ai-suggestion">
             <p>AI建议：{{ aiContentSuggestion }}</p>
             <el-button
@@ -509,6 +524,7 @@ const teachingTips = [
 
 // AI内容建议
 const aiContentSuggestion = ref('根据您的时间分配，建议重点讲解核心知识点，并留出足够的互动和练习时间。')
+const teachContents = ref([])
 const generatingContent = ref(false)
 
 // 生成AI内容
@@ -517,7 +533,8 @@ const generateAIContent = async () => {
   try {
     // 模拟API调用
     const res = await aiGenerationApproximateTeachingContentService(teacherScheduleId)
-    lessonData.value.mainContent = res.msg
+    lessonData.value.mainContent = res.data.mainTeachContent
+    teachContents.value = res.data.teachContent
     ElMessage.success('内容生成成功')
     generatingContent.value = false
     // setTimeout(() => {
@@ -529,6 +546,21 @@ const generateAIContent = async () => {
     ElMessage.error('生成失败，请重试')
     generatingContent.value = false
   }
+}
+
+
+// 选择教学内容
+const selectTeachContent = (teachContent, index) => {
+  // 保存当前的教学内容
+  const currentValue = lessonData.value.mainContent
+
+  // 更新教学内容为选中的备选方案
+  lessonData.value.mainContent = teachContent
+
+  // 将原来的教学内容放入备选方案中替换被选中的方案
+  teachContents.value[index] = currentValue
+
+  ElMessage.success('已切换教学内容')
 }
 
 // 预期结果相关
