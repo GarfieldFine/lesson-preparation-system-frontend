@@ -34,8 +34,7 @@ onMounted(async () => {
   // console.log(res1)
   const res3 = await getLessonPreparationRecordByIdService(LessonPreparationRecId)
   isFinish.value = res3.data.teachingState
-  const res4 = await chapterLessonPreparationGetListByLessonPreparationRecordIdService(LessonPreparationRecId)
-  chapterList.value = res4.data
+
 })
 
 // 使用计算属性将数组转换成字符串
@@ -149,12 +148,14 @@ const goToTeachingCalendar = () => {
 }
 
 // 打开教案章节列表弹窗
-const openTeachingPlanDialog = () => {
-  chapterList.value = [
-    { id: 1, chapterName: '第一章：课程介绍', createTime: '2023-09-01' },
-    { id: 2, chapterName: '第二章：基础知识', createTime: '2023-09-05' },
-    { id: 3, chapterName: '第三章：进阶内容', createTime: '2023-09-10' }
-  ]
+const openTeachingPlanDialog = async () => {
+  // chapterList.value = [
+  //   { id: 1, chapterName: '第一章：课程介绍', createTime: '2023-09-01' },
+  //   { id: 2, chapterName: '第二章：基础知识', createTime: '2023-09-05' },
+  //   { id: 3, chapterName: '第三章：进阶内容', createTime: '2023-09-10' }
+  // ]
+  const res4 = await chapterLessonPreparationGetListByLessonPreparationRecordIdService(LessonPreparationRecId)
+  chapterList.value = res4.data
   teachingPlanDialogVisible.value = true
 }
 
@@ -369,7 +370,7 @@ const goToTeachingPlan = (chapterId) => {
           </div>
           <div class="chapter-info">
             <h3 class="chapter-title">{{ chapter.chapterName }}</h3>
-            <p class="chapter-date">创建于: {{ chapter.createTime }}</p>
+            <p class="chapter-date">创建于: {{ chapter.createTime.split('T')[0] }}</p>
           </div>
           <div class="chapter-action">
             <i class="el-icon-right"></i>
@@ -1105,16 +1106,6 @@ const goToTeachingPlan = (chapterId) => {
   backdrop-filter: blur(8px);
   transform: translateZ(0);
 
-  @keyframes dialogFadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(-20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
 
   animation: dialogFadeIn 0.3s ease-out;
 

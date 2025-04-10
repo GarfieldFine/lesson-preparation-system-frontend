@@ -168,21 +168,21 @@ const teachingTips = [
           :default-active="activeMenu"
           class="nav-menu"
         >
-          <el-menu-item index="activities" @click="goToTeachingActivities">
-            <el-icon><Document /></el-icon>
-            教学活动安排
+          <el-menu-item index="content" @click="goToTeachingContent">
+            <el-icon><Reading /></el-icon>
+            教学内容
           </el-menu-item>
           <el-menu-item index="time" @click="goToTimeAllocation">
             <el-icon><Timer /></el-icon>
             时间分配
           </el-menu-item>
+          <el-menu-item index="activities" @click="goToTeachingActivities">
+            <el-icon><Document /></el-icon>
+            教学活动安排
+          </el-menu-item>
           <el-menu-item index="results" @click="goToExpectedResults">
             <el-icon><Aim /></el-icon>
             预期结果
-          </el-menu-item>
-          <el-menu-item index="content" @click="goToTeachingContent">
-            <el-icon><Reading /></el-icon>
-            教学内容
           </el-menu-item>
         </el-menu>
       </div>
