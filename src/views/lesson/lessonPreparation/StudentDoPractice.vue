@@ -738,7 +738,7 @@ watch(() => route.params.questionId, async (newId) => {
   gap: 24px;
   position: relative;
   overflow: hidden;
-  height: 390px;
+  height: 420px;
 }
 
 .question-header {

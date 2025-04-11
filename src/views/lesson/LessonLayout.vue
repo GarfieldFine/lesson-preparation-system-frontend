@@ -38,8 +38,6 @@ const handleClose = () => {
             <el-menu-item index="/lesson/lesson_hour/studentDetail">学生详情</el-menu-item>
             <el-menu-item index="/lesson/examGen">生成考试内容</el-menu-item>
             <el-menu-item index="/lesson/student/exam">考试</el-menu-item>
-            <el-menu-item index="/lesson/teachingCalendar">教学日历</el-menu-item>
-            <el-menu-item index="/lesson/overAllGeneration">整体生成</el-menu-item>
 
           </el-sub-menu>
           <el-sub-menu index="2">
