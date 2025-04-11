@@ -50,6 +50,36 @@ const router = useRouter()
 onMounted(async () => {
 })
 
+//获取多媒体资源
+const getMultimedia=async ()=>{
+  //todo 判断教学内容是否生成
+  // const res= await (teacherScheduleId);
+  const res=false;
+  //说明教学内容已经存在
+  if(res){
+    //todo 获取多媒体资源
+    // createMultimedia(teacherScheduleId);
+  }else{
+    ElMessage.error('请先生成教学内容');
+  }
+}
+
+//获取备课
+const getLessonPreparation = async () => {
+  const res = await chapterLessonPreparationGetListByIdService(teacherScheduleId)
+  console.log(res)
+  lessonPreparation.value = res.data
+}
+getLessonPreparation()
+//获取教学贴士
+const getTeachingTips = async () => {
+  const res = await chapterLessonPreparationGetListByIdService(teacherScheduleId)
+  console.log(res);
+  lessonPreparation.value = res.data
+}
+
+
+
 const goAiGenerate = async () => {
   fullscreenLoading.value = true;
   const res = await chapterLessonPreparationAiGenerateTeachingSignService(teacherScheduleId)
@@ -59,9 +89,11 @@ const goAiGenerate = async () => {
   dialogFormVisible.value = false
   ElMessage.success('生成成功')
 }
+
 const openConfirm = () => {
   router.push(`/lesson/overAllGeneration/${teacherScheduleId}`)
 }
+
 const saveContent = async () => {
   const res = await chapterLessonPreparationUpdateService(teacherScheduleId, AiGenerateTeachingSign.value)
   console.log(res)
@@ -79,6 +111,10 @@ const goToTimeAllocation = () => {
 
 const goToExpectedResults = () => {
   router.push(`/lesson/lesson_hour/mylessonpreparation/ExpectedResult/${teacherScheduleId}`)
+}
+//前往多媒体资源
+const goToMultimedia= () => {
+  router.push(`/lesson/lesson_hour/multimedia/ppt/${teacherScheduleId}`)
 }
 
 const goToTeachingContent = () => {
@@ -184,6 +220,10 @@ const teachingTips = [
             <el-icon><Aim /></el-icon>
             预期结果
           </el-menu-item>
+          <el-menu-item index="content" @click="goToMultimedia">
+            <el-icon><Reading /></el-icon>
+            多媒体资源
+          </el-menu-item>
         </el-menu>
       </div>
 
@@ -213,7 +253,7 @@ const teachingTips = [
           <div class="tools-panel">
             <h3>教学工具</h3>
             <div class="tool-buttons">
-              <el-button class="tool-btn" type="primary" plain style="margin-left: 10px;">
+              <el-button class="tool-btn" type="primary" plain style="margin-left: 10px;" @click="getMultimedia">
                 <el-icon><VideoCamera /></el-icon>
                 多媒体资源生成
               </el-button>

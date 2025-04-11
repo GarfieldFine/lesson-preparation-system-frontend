@@ -6,6 +6,22 @@ const router = createRouter({
     { path: '/login', component: () => import('@/views/login/LoginPage.vue') },
     { path: '/index', component: () => import('@/views/index.vue') },
     {
+      path: '/lesson/lesson_hour/multimedia/ppt',
+      component: () => import('@/views/multimedia/PPT.vue')
+    },
+    {
+      path: '/lesson/lesson_hour/multimedia/images',
+      component: () => import('@/views/multimedia/Images.vue')
+    },
+    {
+      path: '/lesson/lesson_hour/multimedia/mindmap',
+      component: () => import('@/views/multimedia/MindMap.vue')
+    },
+    {
+      path: '/lesson/lesson_hour/multimedia/videos',
+      component: () => import('@/views/multimedia/Videos.vue')
+    },
+    {
       path: '/lesson/student/exam/:examQuestionGroupId',
       component: () => import('@/views/lesson/lessonPreparation/StudentExamination.vue')
     },
@@ -161,7 +177,7 @@ const router = createRouter({
                 {
                   path: '/lesson/practice/ai-assistant',
                   component: () => import('@/views/lesson/practice/AiAssistant.vue')
-                }
+                },
               ]
             }
           ]
