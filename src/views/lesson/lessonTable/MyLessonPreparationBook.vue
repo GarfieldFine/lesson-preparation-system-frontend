@@ -4,7 +4,7 @@ import { teacherScheduleGetListByLessonPreparationRecIdService } from '@/api/tea
 import { lessonPreparationRecordGetClassNameService, lessonPreparationRecordAddClassService } from '@/api/lessonPreparationRecord.js'
 import { classGetAllNameService } from '@/api/class.js'
 import { useRoute, useRouter } from 'vue-router'
-import { lessonPreparationRecordUpdateTeachingPlanningService } from '@/api/lessonPreparationRecord.js'
+// import { lessonPreparationRecordUpdateTeachingPlanningService } from '@/api/lessonPreparationRecord.js'
 
 const router = useRouter()
 const LessonPreparationRecId = useRoute().params.lessonPreparationBookId
@@ -16,6 +16,16 @@ const classId = ref('')
 const activeCategory = ref(null) // 添加当前激活的分类状态
 const hoverTimer = ref(null) // 添加悬停计时器
 
+// 添加计算属性获取所有章节列表
+const teachingPlannings = computed(() => {
+  const plannings = new Set()
+  lessonPreparationList.value.forEach(lesson => {
+    if (lesson.teachingPlanning) {
+      plannings.add(lesson.teachingPlanning)
+    }
+  })
+  return Array.from(plannings)
+})
 
 // ... existing refs ...
 const editDialogVisible = ref(false)
@@ -23,11 +33,21 @@ const currentLesson = ref(null)
 const newTeachingPlanning = ref('')
 
 
-// 添加修改章节的方法
-const openEditDialog = (lesson) => {
+// 修改ref定义
+const popoverVisible = ref(false)
+const popoverTriggerRef = ref(null)
+
+// 修改打开方法
+const openEditPopover = (lesson, event) => {
   currentLesson.value = lesson
   newTeachingPlanning.value = lesson.teachingPlanning || ''
-  editDialogVisible.value = true
+  popoverTriggerRef.value = event.currentTarget
+  popoverVisible.value = true
+}
+
+// 修改关闭方法
+const closePopover = () => {
+  popoverVisible.value = false
 }
 
 const updateTeachingPlanning = async () => {
@@ -38,6 +58,7 @@ const updateTeachingPlanning = async () => {
       currentLesson.value.id, 
       newTeachingPlanning.value
     )
+    console.log('修改成功')
     ElMessage.success('修改成功')
     editDialogVisible.value = false
     // 刷新数据
@@ -176,6 +197,26 @@ const goToTeachingCalendar = () => {
 // // 实际实现可以使用 router.push 进行路由跳转
 //   router.push(`/lesson/teachingPlan/${LessonPreparationRecId}`)
 // }
+
+
+const getPopoverPosition = () => {
+  if (!popoverTriggerRef.value) return {}
+  
+  const rect = popoverTriggerRef.value.getBoundingClientRect()
+  return {
+    position: 'fixed',
+    top: `${rect.bottom + window.scrollY - 270}px`,
+    left: `${rect.left + window.scrollX + 100}px`
+  }
+}
+
+const updateTeachSchedule = async () => {
+  const res = await updateTeachScheduleAPI(lessonPreparationList.value)
+}
+
+const handleSelectClick = (e) => {
+  e.stopPropagation()
+}
 </script>
 
 <template>
@@ -300,13 +341,64 @@ const goToTeachingCalendar = () => {
                   <div class="status-badge" :class="[new Date(lesson.fullClassTime) < new Date() ? 'completed' : 'upcoming']">
                     {{ new Date(lesson.fullClassTime) < new Date() ? '已上' : '未上' }}
                   </div>
-                  
+                  <!-- new Date(lesson.fullClassTime) >= new Date() -->
+                  <!-- 修改课时卡片中的按钮 -->
+                  <el-button 
+                    v-if="true"
+                    class="edit-button" 
+                    size="small" 
+                    @click.stop="openEditPopover(lesson, $event)"
+                  >
+                    修改
+                  </el-button>
+
                   <div class="action-button">
                     <i class="el-icon-right"></i>
                   </div>
                 </div>
               </div>
+
+              <!-- 课时修改按钮 --><!-- 添加修改章节的对话框 -->
+  <!-- 添加弹出层 -->
+  <teleport to="body" v-if="popoverVisible">
+    <div  class="popover-overlay">
+      <div class="popover-content" :style="getPopoverPosition()">
+        <div class="popover-header">
+          <h3>修改课时章节</h3>
+          <i class="el-icon-close" @click="closePopover"></i>
+        </div>
+        <div class="popover-body">
+          <el-select 
+            v-model="newTeachingPlanning" 
+            placeholder="请选择章节"
+            class="teaching-planning-select"
+            @click.native.stop
+          >
+            <el-option
+              v-for="planning in teachingPlannings"
+              :key="planning"
+              :label="planning"
+              :value="planning"
+              @click.native.stop
+            />
+          </el-select>
+        </div>
+        <div class="popover-footer">
+          <el-button plain class="cancel-button" @click="closePopover">取消</el-button>
+          <el-button 
+            type="primary" 
+            class="confirm-button" 
+            @click="updateTeachingPlanning"
+            :disabled="!newTeachingPlanning"
+          >
+            确认修改
+          </el-button>
+        </div>
+      </div>
+    </div>
+  </teleport>
             </div>
+
           </transition>
         </div>
       </div>
@@ -983,5 +1075,85 @@ const goToTeachingCalendar = () => {
     }
   }
 }
-</style>
+.popover-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0);
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
+.popover-content {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.001);
+  width: 400px;
+  max-width: 90%;
+  animation: popover-fade-in 0.3s ease;
+  border: 1px solid #e2e8f0;
+}
+
+.popover-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  
+  h3 {
+    margin: 0;
+    font-size: 16px;
+    color: #333;
+  }
+  
+  .el-icon-close {
+    cursor: pointer;
+    color: #999;
+    font-size: 18px;
+    
+    &:hover {
+      color: #666;
+    }
+  }
+}
+
+.popover-body {
+  padding: 20px;
+}
+
+.popover-footer {
+  padding: 12px 20px;
+  border-top: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+@keyframes popover-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// 保持原有的select样式
+.teaching-planning-select {
+  width: 100%;
+  
+  :deep(.el-input__wrapper) {
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    padding: 0.5rem 1rem;
+  }
+}
+
+</style>
