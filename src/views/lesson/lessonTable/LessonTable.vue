@@ -1,7 +1,12 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import { teacherScheduleGetService, teacherScheduleReassignmentService } from '@/api/teacherSchedule.js'
+import {
+  ImportClassScheduleService,
+  teacherScheduleGetService,
+  teacherScheduleReassignmentService
+} from '@/api/teacherSchedule.js'
 import { classRoomGetAllService } from '@/api/classRoom.js'
+import { ElMessage } from 'element-plus'
 
 const importLessonTableVisable = ref(false)
 const dialogFormVisible = ref(false)
@@ -161,6 +166,15 @@ const goReassignment = async () => {
   dialogFormVisible.value = false
   await goTeacherScheduleGetService()
 }
+const importTeacherSchedule = async () => {
+  const fd = new FormData();
+  fd.append('file', uploadedFiles.value[0]);
+  await ImportClassScheduleService(fd)
+  ElMessage.success('导入成功')
+  importLessonTableVisable.value = false
+  uploadedFiles.value = [];
+}
+
 
 </script>
 <template>
@@ -227,7 +241,7 @@ const goReassignment = async () => {
     <div v-if="selectedCourse" class="course-details-dialog">
       <div class="dialog-content">
         <h3>{{ selectedCourse.name }}</h3>
-        <p>教师：{{ selectedCourse.teacher }}</p>
+<!--        <p>教师：{{ selectedCourse.teacher }}</p>-->
         <p>教室：{{ selectedCourse.classroom }}</p>
         <div>
           <button @click="closeCourseDetails" style="margin-right: 50px;margin-left: 30px">关闭</button>
@@ -301,21 +315,22 @@ const goReassignment = async () => {
   <el-dialog v-model="importLessonTableVisable" title="课表导入" width="800">
     <el-upload
       class="upload-area custom-upload"
+      style="width: 730px;"
       drag
       multiple
       :auto-upload="false"
       :on-change="handleFileChange"
       :on-remove="handleFileRemove"
-      accept=".doc,.docx,.pdf">
+      accept=".doc,.docx,.pdf,.xlsx,.xls">
       <el-icon class="el-icon--upload"><i class="fas fa-cloud-upload-alt"></i></el-icon>
       <div class="el-upload__text">
         拖放文件到此处或<em>浏览文件</em>
       </div>
       <template #tip>
-        <div class="file-hint">支持的格式: DOC, PDF</div>
+        <div class="file-hint">支持的格式: excel</div>
       </template>
     </el-upload>
-    <el-button type="primary" style="margin-top: 15px;transform: translateX(670px)"   >导入</el-button>
+    <el-button type="primary" style="margin-top: 15px;transform: translateX(670px)" @click="importTeacherSchedule">导入</el-button>
   </el-dialog>
 
 </template>

@@ -88,7 +88,9 @@ const goToExpectedResults = () => {
 const goToTeachingContent = () => {
   router.push(`/lesson/mylessonpreparation/TeachingContent/${chapterLessonPreparationId}`)
 }
-
+const goToMultimedia= () => {
+  router.push(`/lesson/lesson_hour/multimedia/ppt`)
+}
 const goPracticeQuestionGeneration = () => {
   router.push(`/lesson/practice/generate`)
 }
@@ -178,6 +180,10 @@ const teachingTips = [
           <el-menu-item index="content" @click="goToTeachingContent">
             <el-icon><Reading /></el-icon>
             教学内容
+          </el-menu-item>
+          <el-menu-item index="content" @click="goToMultimedia">
+            <el-icon><Reading /></el-icon>
+            多媒体资源
           </el-menu-item>
         </el-menu>
       </div>

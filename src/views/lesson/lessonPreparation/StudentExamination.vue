@@ -92,7 +92,7 @@
     <!-- 以下内容只在未提交考试时显示 -->
     <template v-if="isExamSubmitted === 0">
       <!-- 顶部考试信息和倒计时 -->
-      <div class="exam-header glass-card">
+      <div class="exam-header glass-card" style="margin-right: 100px;margin-left: 100px;">
         <div class="exam-info">
           <h2>{{ examData.examName || '期末考试' }}</h2>
           <div class="exam-meta">
@@ -145,7 +145,7 @@
       <!-- 左侧内容区 -->
       <div class="left-panel">
         <!-- 主要题目卡片 -->
-        <div class="glass-card main-question-card">
+        <div class="glass-card main-question-card" style="margin-right: 50px;margin-left: 100px;width: 1000px;">
           <div class="question-header">
             <div class="question-meta">
               <div class="question-number">第 {{ currentQuestionIndex + 1 }} 题 / 共 {{ examData.questions.length }} 题</div>
@@ -222,7 +222,7 @@
         </div>
 
         <!-- 导航控制区 -->
-        <div class="glass-card navigation-card">
+        <div class="glass-card navigation-card" style="margin-right: 50px;margin-left: 100px;width: 1000px;">
           <div class="navigation-controls">
             <el-button
               @click="navigateQuestion('prev')"
@@ -258,7 +258,7 @@
 
       <!-- 右侧答题卡区域 -->
       <div class="right-panel">
-        <div class="glass-card answer-sheet">
+        <div class="glass-card answer-sheet" style="transform: translateX(-100px)">
           <h3>
             <el-icon><Document /></el-icon>
             答题卡
@@ -386,8 +386,8 @@ import { submitExamAnswerService } from '@/api/studentExamRecord.js'
 
 const route = useRoute()
 const router = useRouter()
-// const examId = route.params.examId
-const examId = 6
+const examId = route.params.examQuestionGroupId
+// const examId = 6
 
 // 考试数据
 const examData = reactive({
@@ -866,6 +866,7 @@ onMounted(async () => {
   flex-direction: column;
   align-items: center;
   padding: 40px;
+
   position: relative;
   overflow: hidden;
   animation: fadeInUp 0.8s ease;
@@ -1160,6 +1161,7 @@ onMounted(async () => {
   grid-template-columns: 1fr 350px;
   gap: 24px;
   padding: 24px;
+  padding-top: 40px;
   min-height: calc(100vh - 64px);
   background: linear-gradient(135deg, #f6f8fc 0%, #e9f0f9 100%);
   position: relative;
@@ -1252,7 +1254,20 @@ onMounted(async () => {
   border: 1px solid rgba(255, 255, 255, 0.4);
   margin-bottom: 24px;
   transition: all 0.3s ease;
+
 }
+.glass-card1 {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  margin-bottom: 24px;
+  transition: all 0.3s ease;
+
+}
+
 
 .glass-card:hover {
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.12);
@@ -2394,42 +2409,5 @@ onMounted(async () => {
   0% { box-shadow: 10014px 0 0 -5px; }
   30% { box-shadow: 10014px 0 0 2px; }
   60%, 100% { box-shadow: 10014px 0 0 -5px; }
-}
-
-/* 响应式布局 */
-@media (max-width: 1200px) {
-  .examination-container {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "header"
-      "left"
-      "right";
-  }
-
-  .right-panel {
-    max-width: 100%;
-  }
-
-  .question-grid {
-    grid-template-columns: repeat(8, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
-  .exam-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
-  }
-
-  .question-grid {
-    grid-template-columns: repeat(5, 1fr);
-  }
-
-  .question-meta {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
 }
 </style>

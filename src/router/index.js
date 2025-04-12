@@ -4,10 +4,47 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     { path: '/login', component: () => import('@/views/login/LoginPage.vue') },
+    { path: '/index', component: () => import('@/views/index.vue') },
+    {
+      path: '/lesson/lesson_hour/multimedia/ppt',
+      component: () => import('@/views/multimedia/PPT.vue')
+    },
+    {
+      path: '/lesson/lesson_hour/multimedia/images',
+      component: () => import('@/views/multimedia/Images.vue')
+    },
+    {
+      path: '/lesson/lesson_hour/multimedia/mindmap',
+      component: () => import('@/views/multimedia/MindMap.vue')
+    },
+    {
+      path: '/lesson/lesson_hour/multimedia/videos',
+      component: () => import('@/views/multimedia/Videos.vue')
+    },
+    {
+      path: '/lesson/student/exam/:examQuestionGroupId',
+      component: () => import('@/views/lesson/lessonPreparation/StudentExamination.vue')
+    },
+    {
+      path: '/lesson/student/practice/:practiceGroupId',
+      component: () => import('@/views/lesson/practice/StudentPractice.vue')
+    },
+    {
+      path: '/lesson/student-feedback/:teacherScheduleId',
+      component: () => import('@/views/lesson/lessonPreparation/StudentFeedback.vue')
+    },
+    {
+      path: '/lesson/student/questionBank',
+      component: () => import('@/views/lesson/lessonPreparation/StudentQuestionBank.vue')
+    },
+    {
+      path: '/lesson/student/doPractice/:questionId',
+      component: () => import('@/views/lesson/lessonPreparation/StudentDoPractice.vue')
+    },
     {
       path: '/',
       component: () => import('@/views/layout/LayoutContainer.vue'),
-      redirect: '/lesson/lesson_hour/mylessonpreparation',
+      redirect: '/index',
       children: [
         {
           path: '/app/index',
@@ -62,10 +99,7 @@ const router = createRouter({
               path: '/lesson/post-feedback/:teacherScheduleId',
               component: () => import('@/views/lesson/lessonPreparation/PostFeedback.vue')
             },
-            {
-              path: '/lesson/student-feedback',
-              component: () => import('@/views/lesson/lessonPreparation/StudentFeedback.vue')
-            },
+
             {
               path: '/lesson/teachingPlan/:chapterLessonPreparationId',
               component: () => import('@/views/lesson/lessonPreparation/TeachingPlan.vue')
@@ -74,17 +108,10 @@ const router = createRouter({
               path: '/lesson/student/questionBank',
               component: () => import('@/views/lesson/lessonPreparation/StudentQuestionBank.vue')
             },
-            {
-              path: '/lesson/student/doPractice/:questionId',
-              component: () => import('@/views/lesson/lessonPreparation/StudentDoPractice.vue')
-            },
+
             {
               path: '/lesson/examGen',
               component: () => import('@/views/lesson/lessonPreparation/ExamGen.vue')
-            },
-            {
-              path: '/lesson/student/exam',
-              component: () => import('@/views/lesson/lessonPreparation/StudentExamination.vue')
             },
             {
               path: '/lesson/teachingCalendar/:lessonPreparationRecId',
@@ -127,10 +154,6 @@ const router = createRouter({
               component: () => import('@/views/lesson/lessonTable/OverallAIGeneration.vue')
             },
             {
-              path: '/lesson/student/practice',
-              component: () => import('@/views/lesson/practice/StudentPractice.vue')
-            },
-            {
               path: '/lesson/practice',
               component: () => import('@/views/lesson/createQuestion1.vue'),
               redirect: '/lesson/practice/generate',
@@ -154,7 +177,7 @@ const router = createRouter({
                 {
                   path: '/lesson/practice/ai-assistant',
                   component: () => import('@/views/lesson/practice/AiAssistant.vue')
-                }
+                },
               ]
             }
           ]

@@ -704,7 +704,7 @@ watch(() => route.params.questionId, async (newId) => {
   display: grid;
   grid-template-columns: 1fr 400px;
   gap: 24px;
-  padding: 24px;
+  padding: 24px 76px;
   min-height: calc(100vh - 64px);
   background: linear-gradient(135deg, #f6f8fc 0%, #e9f0f9 100%);
   position: relative;
@@ -738,6 +738,7 @@ watch(() => route.params.questionId, async (newId) => {
   gap: 24px;
   position: relative;
   overflow: hidden;
+  height: 420px;
 }
 
 .question-header {
@@ -1180,7 +1181,7 @@ watch(() => route.params.questionId, async (newId) => {
 }
 
 .chat-container {
-  height: 560px;
+  height: 600px;
   display: flex;
   flex-direction: column;
   background: rgba(255, 255, 255, 0.9);

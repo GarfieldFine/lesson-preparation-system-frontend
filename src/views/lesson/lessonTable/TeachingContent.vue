@@ -13,6 +13,10 @@
 
       <!-- 移动保存按钮到这里，改为固定定位 -->
       <div class="save-button-container">
+        <button class="media-button" @click="generateMedia" :disabled="isGeneratingMedia">
+          <i class="el-icon-picture"></i>
+          {{ isGeneratingMedia ? '生成中...' : '多媒体资源生成' }}
+        </button>
         <button class="save-button" @click="saveContent" :disabled="isSaving">
           <i class="el-icon-upload"></i>
           {{ isSaving ? '保存中...' : '保存内容' }}
@@ -77,12 +81,14 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch, nextTick, h } from 'vue'
 import { MdPreview } from 'md-editor-v3'
+import router from '@/router'
 import 'md-editor-v3/lib/style.css'
 import { lessonHourPreparationGetTeachingContentByIdService,
   lessonHourPreparationAiReviseTeachingContentService,
   lessonHourPreparationSaveTeachingContentService }
   from '@/api/lessonHourPreparationLesson.js'
 import { useRoute } from 'vue-router'
+import { ElMessage } from 'element-plus'
 const teacherScheduleId = useRoute().params.teacherScheduleId
 const id = 'preview-only'
 const previewRef = ref(null)
@@ -430,6 +436,28 @@ const saveContent = async () => {
     ElMessage.error('保存失败，请重试')
   } finally {
     isSaving.value = false
+  }
+}
+// 添加保存和多媒体生成相关的状态
+const isGeneratingMedia = ref(false)
+
+// 添加多媒体资源生成功能
+const generateMedia = async () => {
+  if (isGeneratingMedia.value) return
+
+  isGeneratingMedia.value = true
+  try {
+    // 这里添加多媒体资源生成的API调用
+    // 示例：await generateMediaResourceService(chapterLessonPreparationId, markdownContent.value)
+    // 模拟API调用
+    // await new Promise(resolve => setTimeout(resolve, 1000))
+    router.push("/lesson/lesson_hour/multimedia/ppt")
+    ElMessage.success('多媒体资源生成成功')
+  } catch (error) {
+    console.error('多媒体资源生成失败:', error)
+    ElMessage.error('多媒体资源生成失败，请重试')
+  } finally {
+    isGeneratingMedia.value = false
   }
 }
 </script>
@@ -803,8 +831,11 @@ const saveContent = async () => {
   top: 36px;
   right: 46px;
   z-index: 100;
+  display: flex;
+  gap: 12px;
 }
 
+.media-button,
 .save-button {
   display: flex;
   align-items: center;
@@ -820,19 +851,26 @@ const saveContent = async () => {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+
 .save-button:hover {
   background: #2c5282;
   transform: translateY(-1px);
 }
 
+.media-button:active,
 .save-button:active {
   transform: translateY(1px);
 }
 
+.media-button:disabled,
 .save-button:disabled {
   opacity: 0.7;
   cursor: not-allowed;
   background: #64748b;
+}
+
+.media-button {
+  background: #38a169; /* 使用绿色区分多媒体按钮 */
 }
 
 .save-button i {

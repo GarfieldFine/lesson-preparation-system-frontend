@@ -240,6 +240,14 @@
       </div>
 
       <div class="publish-options">
+
+        <h3>请输入标题</h3>
+          <el-input
+            v-model="title"
+            placeholder="请输入标题..."
+            class="search-box"
+            style="margin-bottom: 8px"
+          />
         <h3>发布类型</h3>
         <el-radio-group v-model="publishType" class="publish-type-options">
           <el-radio label="1">课前预习题</el-radio>
@@ -429,6 +437,7 @@ const selectAll = ref(false)
 const currentPage = ref(1)
 const pageSize = ref(8)
 const total = ref(50)
+const title = ref('')
 const mockQuestionBank = ref([])
 const isLoading = ref(false)
 onMounted(async () => {
@@ -615,11 +624,12 @@ const handlePublishQuestions = () => {
   ElMessage.success(`成功将 ${selectedPublishQuestions.value.length} 道题目发布为${publishTypeText[publishType.value]}${deadlineText}`)
   publishDialogVisible.value = false
 
-  //真实场景这里需要调用API
+  //调用API
   const data = {
     teacherScheduleId: teacherScheduleId,
     type: publishType.value,
     dueAt: publishDeadline.value,
+    title: title.value,
     questionCount: selectedPublishQuestions.value.length,
     questionIds: selectedPublishQuestions.value.map(q => (
       q.id

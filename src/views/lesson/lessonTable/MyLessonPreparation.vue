@@ -109,7 +109,7 @@ const resetFilters = () => {
 
         <el-dropdown trigger="click" class="filter-dropdown">
           <el-button
-            :type="filterYear || filterTerm !== '' || filterStatus !== '' ? 'success' : 'default'"
+            :type="filterYear || filterTerm !== '' || filterStatus !== '' ? 'primary' : 'default'"
             class="filter-button"
           >
             <el-icon><Filter /></el-icon>
@@ -157,7 +157,7 @@ const resetFilters = () => {
           </template>
         </el-dropdown>
 
-        <el-button type="success" class="create-button" @click="goCreateLessonPreparation">
+        <el-button type="primary" class="create-button" @click="goCreateLessonPreparation">
           <el-icon><Plus /></el-icon>
           创建备课本
         </el-button>
@@ -170,7 +170,7 @@ const resetFilters = () => {
           <template #description>
             <p>暂无备课记录，点击"创建备课本"开始准备课程</p>
           </template>
-          <el-button type="success" @click="goCreateLessonPreparation">
+          <el-button type="primary" @click="goCreateLessonPreparation">
             <el-icon><Plus /></el-icon> 创建备课本
           </el-button>
         </el-empty>
@@ -222,7 +222,7 @@ const resetFilters = () => {
 .dashboard-container {
   min-height: 100vh;
   padding: 24px;
-  background: linear-gradient(135deg, #f8fcf8 0%, #edf7ed 100%);
+  background: linear-gradient(135deg, #f0f7fa 0%, #e1f5fe 100%);
 }
 
 .lesson-list {
@@ -243,10 +243,10 @@ const resetFilters = () => {
   border-left: 4px solid transparent;
 
   &:hover {
-    background: #f5faf5;
+    background: #f5f9ff;
     transform: translateX(4px);
-    border-left-color: #4caf50;
-    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.08);
+    border-left-color: #1976d2;
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.08);
   }
 }
 .dashboard-header {
@@ -270,7 +270,7 @@ const resetFilters = () => {
       justify-content: center;
       width: 40px;
       height: 40px;
-      background: #4caf50;
+      background: #1976d2;
       border-radius: 8px;
       color: white;
       font-size: 20px;
@@ -298,12 +298,12 @@ const resetFilters = () => {
         transition: all 0.3s;
 
         &:hover, &:focus {
-          box-shadow: 0 2px 12px rgba(76, 175, 80, 0.2);
+          box-shadow: 0 2px 12px rgba(33, 150, 243, 0.2);
         }
       }
 
       :deep(.el-input__prefix) {
-        color: #4caf50;
+        color: #1976d2;
       }
     }
 
@@ -316,12 +316,12 @@ const resetFilters = () => {
 
       &:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+        box-shadow: 0 4px 12px rgba(33, 150, 243, 0.2);
       }
     }
 
     .create-button {
-      background: #4caf50;
+      background: #1976d2;
       border: none;
       border-radius: 8px;
       padding: 0 20px;
@@ -333,8 +333,8 @@ const resetFilters = () => {
 
       &:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
-        background: #43a047;
+        box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+        background: #1565c0;
       }
     }
   }
@@ -406,10 +406,10 @@ const resetFilters = () => {
   border-left: 4px solid transparent;
 
   &:hover {
-    background: #f1f8e9;
+    background: #e3f2fd;
     transform: translateX(4px);
-    border-left-color: #4caf50;
-    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.1);
+    border-left-color: #1976d2;
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.1);
   }
 
   .lesson-status {
@@ -425,8 +425,8 @@ const resetFilters = () => {
       font-weight: 500;
 
       &.active {
-        background: #eef8ef;
-        color: #4caf50;
+        background: #e3f2fd;
+        color: #1976d2;
       }
 
       &.completed {
@@ -459,7 +459,7 @@ const resetFilters = () => {
 
         .el-icon {
           font-size: 16px;
-          color: #4caf50;
+          color: #1976d2;
         }
       }
     }
@@ -472,8 +472,8 @@ const resetFilters = () => {
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background: #eef8ef;
-    color: #4caf50;
+    background: #e3f2fd;
+    color: #1976d2;
     transition: all 0.3s;
 
     .action-icon {
@@ -481,7 +481,7 @@ const resetFilters = () => {
     }
 
     &:hover {
-      background: #5cb85c;
+      background: #1976d2;
       color: white;
       transform: scale(1.1);
     }
@@ -498,16 +498,16 @@ const resetFilters = () => {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(45deg, #6abe6e, #a3d8a5);
+  background: linear-gradient(45deg, #2196f3, #64b5f6);
   border-radius: 4px;
 
   &:hover {
-    background: linear-gradient(45deg, #5cb85c, #8bc34a);
+    background: linear-gradient(45deg, #1976d2, #42a5f5);
   }
 }
 
 .create-button {
-  background: #5cb85c;
+  background: #2196f3;
   border: none;
   border-radius: 8px;
   padding: 0 20px;
@@ -519,8 +519,8 @@ const resetFilters = () => {
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
-    background: #4caf50;
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.2);
+    background: #1976d2;
   }
 }
 </style>
