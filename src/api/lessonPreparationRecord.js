@@ -39,3 +39,10 @@ export const lessonPreparationRecordUpdateTeachingStateService = (lessonPreparat
     teachingState
   })
 }
+
+export const lessonPreparationRecordUpdateTeachingPlanningService = (lessonPreparationRecordId,teachingPlanning) => {
+  return request.post('/lessonPreparationRecord/update/teachingPlanning',{
+    lessonPreparationRecordId,
+    teachingPlanning
+  })
+}
