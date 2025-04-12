@@ -4,6 +4,7 @@ import { teacherScheduleGetListByLessonPreparationRecIdService } from '@/api/tea
 import { lessonPreparationRecordGetClassNameService, lessonPreparationRecordAddClassService } from '@/api/lessonPreparationRecord.js'
 import { classGetAllNameService } from '@/api/class.js'
 import { useRoute, useRouter } from 'vue-router'
+import { lessonPreparationRecordUpdateTeachingPlanningService } from '@/api/lessonPreparationRecord.js'
 
 const router = useRouter()
 const LessonPreparationRecId = useRoute().params.lessonPreparationBookId
@@ -14,6 +15,38 @@ const dialogFormVisible = ref(false)
 const classId = ref('')
 const activeCategory = ref(null) // 添加当前激活的分类状态
 const hoverTimer = ref(null) // 添加悬停计时器
+
+
+// ... existing refs ...
+const editDialogVisible = ref(false)
+const currentLesson = ref(null)
+const newTeachingPlanning = ref('')
+
+
+// 添加修改章节的方法
+const openEditDialog = (lesson) => {
+  currentLesson.value = lesson
+  newTeachingPlanning.value = lesson.teachingPlanning || ''
+  editDialogVisible.value = true
+}
+
+const updateTeachingPlanning = async () => {
+  if (!currentLesson.value || !newTeachingPlanning.value) return
+  
+  try {
+    await lessonPreparationRecordUpdateTeachingPlanningService(
+      currentLesson.value.id, 
+      newTeachingPlanning.value
+    )
+    ElMessage.success('修改成功')
+    editDialogVisible.value = false
+    // 刷新数据
+    const res = await teacherScheduleGetListByLessonPreparationRecIdService(LessonPreparationRecId)
+    lessonPreparationList.value = res.data
+  } catch (error) {
+    ElMessage.error('修改失败')
+  }
+}
 
 onMounted(async () => {
   const res = await teacherScheduleGetListByLessonPreparationRecIdService(LessonPreparationRecId)
@@ -267,6 +300,7 @@ const goToTeachingCalendar = () => {
                   <div class="status-badge" :class="[new Date(lesson.fullClassTime) < new Date() ? 'completed' : 'upcoming']">
                     {{ new Date(lesson.fullClassTime) < new Date() ? '已上' : '未上' }}
                   </div>
+                  
                   <div class="action-button">
                     <i class="el-icon-right"></i>
                   </div>
