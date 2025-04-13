@@ -38,6 +38,13 @@ const handleCommand = async (command) => {
   }
 }
 
+const goOj = () => {
+  window.location.href = 'http://localhost:5174';
+}
+const goTeacherPort = () => {
+  window.location.href = 'http://localhost:4000/home';
+}
+
 </script>
 <template>
   <div class="common-layout">
@@ -51,16 +58,21 @@ const handleCommand = async (command) => {
           :ellipsis="false"
           router
         >
-          <el-menu-item index="/app/index" style="margin-right: 40px; border: none">
-            <img
-              src="@/assets/img.png"
-              alt=""
-              style="height: 42px; width: 42px; margin-right: 24px"
-            />
-            <span style="color: #696969">智能备课</span>
-          </el-menu-item>
+          <!-- 放在 <el-menu> 内部的合适位置即可，不再使用 el-menu-item -->
+          <div style="display: flex; align-items: center; margin-right: 40px; margin-left: 30px;cursor: pointer;">
+            <router-link to="/index" style="display: flex; align-items: center; text-decoration: none;">
+              <img
+                src="@/assets/logo.png"
+                alt="logo"
+                style="height: 42px; width: 42px; margin-right: 24px"
+              />
+              <span style="color: #696969">智能备课</span>
+            </router-link>
+          </div>
 <!--          <el-menu-item index="/app/index">首页</el-menu-item>-->
           <el-menu-item index="/lesson">备课</el-menu-item>
+          <el-menu-item @click="goOj">在线OJ</el-menu-item>
+          <el-menu-item @click="goTeacherPort">教师端入口</el-menu-item>
 
           <el-menu-item class="selfInfo">
             <el-dropdown placement="bottom-end" @command="handleCommand">

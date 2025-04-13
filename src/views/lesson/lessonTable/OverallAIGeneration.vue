@@ -421,19 +421,19 @@ const activeMenu = ref('')
 
 // 导航方法
 const goToTeachingActivities = () => {
-  router.push(`/lesson/mylessonpreparation/TeachingActivitiesArrangement/${teacherScheduleId}`)
+  router.push(`/lesson/lesson_hour/mylessonpreparation/TeachingContent/${teacherScheduleId}`)
 }
 
 const goToTimeAllocation = () => {
-  router.push(`/lesson/mylessonpreparation/TimeAllocation/${teacherScheduleId}`)
+  router.push(`/lesson/lesson_hour/mylessonpreparation/TimeAllocation/${teacherScheduleId}`)
 }
 
 const goToExpectedResults = () => {
-  router.push(`/lesson/mylessonpreparation/ExpectedResult/${teacherScheduleId}`)
+  router.push(`/lesson/lesson_hour/mylessonpreparation/ExpectedResult/${teacherScheduleId}`)
 }
 
 const goToTeachingContent = () => {
-  router.push(`/lesson/mylessonpreparation/TeachingContent/${teacherScheduleId}`)
+  router.push(`/lesson/lesson_hour/mylessonpreparation/ExpectedResult/${teacherScheduleId}`)
 }
 
 // AI聊天相关

@@ -22,10 +22,11 @@ import {
   VideoCamera
 } from '@element-plus/icons-vue'
 
-import 'md-editor-v3/lib/preview.css'
+import 'md-editor-v3/lib/preview.css';
 
-import 'md-editor-v3/lib/style.css'
+import 'md-editor-v3/lib/style.css';
 import { ElMessage } from 'element-plus'
+import { getByTeacherScheduleIdService } from '@/api/lessonHourPreparationLesson.js'
 import {
   createPPT,
   getMultimedia,
@@ -63,6 +64,7 @@ const teachingSignDto = ref({
 const router = useRouter()
 
 onMounted(async () => {
+  await getLessonPreparation()
 })
 
 //获取多媒体资源
@@ -96,6 +98,9 @@ const handleGetMultimedia=async ()=>{
   }
 }
 
+// 获取备课
+const getLessonPreparation = async () => {
+  const res = await getByTeacherScheduleIdService(teacherScheduleId)
 // 生成多媒体资源
 const handleCreateMultimedia=async (teachContent)=>{
   const pptUrl=await createPPT(teachContent);
@@ -123,6 +128,8 @@ const  handleMultimediaIsExist=async ()=>{
   fullscreenLoading.value = true;
   const res = await getMultimedia(teacherScheduleId)
   console.log(res)
+  lessonPreparation.value = res.data
+}
   return res.data;
 }
 
@@ -227,11 +234,11 @@ const teachingTips = [
     <div class="page-header">
       <div class="header-content">
         <div class="title-section">
-          <h1>{{ lessonPreparation.chapterName }}</h1>
+          <h1>{{ lessonPreparation.chapterTitle }}</h1>
           <div class="lesson-meta">
             <span class="meta-item">
               <el-icon><Clock /></el-icon>
-              课时：{{ AiGenerateTeachingSign.numberOfLessons }} 课时
+              课时：{{ lessonPreparation.lessonHour }} 课时
             </span>
             <span class="meta-item">
               <el-icon><Calendar /></el-icon>

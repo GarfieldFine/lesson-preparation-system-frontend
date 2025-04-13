@@ -12,3 +12,7 @@ export const addStudentPostLessonFeedbackService = ({ teacherScheduleId,satisfac
 export const analysisStudentPostLessonFeedback = (teacherScheduleId) => {
   return request.post(`/postLessonFeedback/analysis/${teacherScheduleId}`)
 }
+
+export const getWordCloudInfo = () => {
+  return request.post('/studentPracticeRecord/get/wordCloud')
+}

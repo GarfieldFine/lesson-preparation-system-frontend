@@ -13,3 +13,11 @@ export const aiAnalysePreLessonPracticeService = (teacherScheduleId,preOrPost) =
     preOrPost
   })
 }
+export const getStudentPrePracticeDetailListService = (teacherScheduleId,preOrPost) => {
+  return request.post('/studentPracticeRecord/get/studentDoPracticeRecords',{
+    teacherScheduleId,
+    preOrPost
+  })
+}
+
+

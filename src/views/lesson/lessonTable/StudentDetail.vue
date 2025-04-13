@@ -17,7 +17,7 @@
     <el-card class="student-info-card">
       <div class="student-info-header">
         <div class="student-avatar-container">
-          <el-avatar :size="100" :src="studentInfo.avatar">
+          <el-avatar :size="100" :src="'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png' ">
             {{ studentInfo.name?.substring(0, 1) }}
           </el-avatar>
           <div class="student-name-info">
@@ -25,7 +25,7 @@
             <div class="student-id">学号：{{ studentInfo.studentId }}</div>
             <div class="student-tags">
               <el-tag v-if="studentInfo.isExcellent" type="danger" effect="plain">优秀学生</el-tag>
-              <el-tag type="warning" effect="plain">{{ studentInfo.position }}</el-tag>
+              <el-tag v-if= "studentInfo.position" type="warning" effect="plain">{{ studentInfo.position }}</el-tag>
             </div>
           </div>
         </div>
@@ -230,7 +230,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import * as echarts from 'echarts'
 import {
   ArrowLeft,
@@ -246,11 +246,15 @@ import {
 import { getStudentDetailService } from '@/api/students.js'
 
 const router = useRouter()
+const route = useRoute()
+const studentId = route.query.studentId
+const teacherScheduleId = route.query.teacherScheduleId
 
 const getStudentDetailDto = ref({
-  studentId: 1,
+  studentId: studentId,
   classId: 1,
   teacherId: 1,
+  teacherScheduleId: teacherScheduleId,
   lessonPreparationRecordId:1
 })
 
@@ -357,6 +361,10 @@ const formatDate = (date) => {
   const month = String(date.getMonth() + 1).padStart(2, '0')
   const day = String(date.getDate()).padStart(2, '0')
   return `${year}-${month}-${day}`
+}
+
+const randomCount = () => {
+  return Math.floor(Math.random() * (100 - 40 + 1)) + 40;
 }
 
 // 初始化图表
@@ -565,7 +573,7 @@ onMounted(async () => {
       {
         name: '完成度',
         type: 'bar',
-        data: [95, 100, 90, 85, 80],
+        data: [randomCount(), randomCount(), randomCount(), randomCount(), randomCount()],
         barWidth: '40%',
         itemStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
@@ -579,7 +587,7 @@ onMounted(async () => {
         name: '得分率',
         type: 'line',
         yAxisIndex: 1,
-        data: [92, 95, 88, 90, 85],
+        data: [randomCount(), randomCount(), randomCount(), randomCount(), randomCount()],
         smooth: true,
         symbol: 'circle',
         symbolSize: 8,

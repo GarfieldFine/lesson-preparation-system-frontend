@@ -81,7 +81,6 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch, nextTick, h } from 'vue'
 import { MdPreview } from 'md-editor-v3'
-import router from '@/router'
 import 'md-editor-v3/lib/style.css'
 import {
   lessonHourPreparationGetTeachingContentByIdService,
@@ -89,13 +88,14 @@ import {
   lessonHourPreparationSaveTeachingContentService, createPPT, saveMultimedia, getMultimedia
 }
   from '@/api/lessonHourPreparationLesson.js'
-import { useRoute } from 'vue-router'
+import { useRoute,useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 const teacherScheduleId = useRoute().params.teacherScheduleId
 const id = 'preview-only'
 const previewRef = ref(null)
 const contentRef = ref(null)
 
+const router = useRouter()
 // 初始化为空字符串
 let markdownContent = ref('')
 //多媒体资源对象
@@ -139,7 +139,7 @@ const fetchContent = async () => {
 
     try {
       const eventSource = new EventSource(
-        `http://localhost:8080/LessonHourPreparation/ai/teachingContent/${teacherScheduleId}`
+        `http://localhost:8084/LessonHourPreparation/ai/teachingContent/${teacherScheduleId}`
       )
 
       eventSource.onopen = () => {

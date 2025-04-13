@@ -41,11 +41,13 @@ export const lessonPreparationRecordUpdateTeachingStateService = (lessonPreparat
 }
 
 
-
-
 export const lessonPreparationRecordUpdateTeachingPlanningService = (lessonPreparationRecordId,teachingPlanning) => {
   return request.get('/lessonPreparationRecord/update/teachingPlanning',{
-    lessonPreparationRecordId,
-    teachingPlanning
+    params: {
+      lessonPreparationRecordId,
+      teachingPlanning
+    }
   })
 }
+
+

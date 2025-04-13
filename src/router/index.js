@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useUserStore } from '@/stores/index.js'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -110,7 +109,7 @@ const router = createRouter({
             },
 
             {
-              path: '/lesson/examGen',
+              path: '/lesson/examGen/:lessonPreparationRecordId',
               component: () => import('@/views/lesson/lessonPreparation/ExamGen.vue')
             },
             {
@@ -187,7 +186,7 @@ const router = createRouter({
   ]
 })
 router.beforeEach((to) => {
-  const userStore = useUserStore()
+  // const userStore = useUserStore()
   // if (!userStore.token && to.path !== '/login') {
   //   ElMessage.error('用户未登录')
   //   return '/login'

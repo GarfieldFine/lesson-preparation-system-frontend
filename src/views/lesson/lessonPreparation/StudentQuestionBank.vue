@@ -338,8 +338,10 @@ onMounted(() => {
 .question-bank-container {
   padding: 24px;
   padding-bottom: 2px;;
-  min-height: calc(100vh - 64px);
   background: linear-gradient(135deg, #f6f8fc 0%, #e9f0f9 100%);
+  min-height: calc(100vh - 54px);
+  display: flex;
+  flex-direction: column;
 }
 
 .page-header {
@@ -518,5 +520,13 @@ onMounted(() => {
 
 :deep(.el-pagination) {
   justify-content: center;
+}
+
+
+
+.question-list-section {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 }
 </style>
