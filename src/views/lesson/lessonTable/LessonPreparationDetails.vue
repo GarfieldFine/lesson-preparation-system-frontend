@@ -1,36 +1,51 @@
 <script setup>
-import '@vueup/vue-quill/dist/vue-quill.snow.css';
-import { onMounted,ref} from 'vue'
+import '@vueup/vue-quill/dist/vue-quill.snow.css'
+import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { chapterLessonPreparationGetListByIdService, chapterLessonPreparationAiGenerateTeachingSignService, chapterLessonPreparationUpdateService } from '@/api/chapterLessonPreparation.js'
+import {
+  chapterLessonPreparationAiGenerateTeachingSignService,
+  chapterLessonPreparationUpdateService
+} from '@/api/chapterLessonPreparation.js'
 
 import {
-  Document,
-  Timer,
   Aim,
-  Reading,
+  Calendar,
   Check,
   Clock,
-  Calendar,
+  Document,
   Edit,
-  VideoCamera,
   EditPen,
   Files,
-  MagicStick
+  MagicStick,
+  Reading,
+  Timer,
+  VideoCamera
 } from '@element-plus/icons-vue'
 
-import 'md-editor-v3/lib/preview.css';
+import 'md-editor-v3/lib/preview.css'
 
-import 'md-editor-v3/lib/style.css';
+import 'md-editor-v3/lib/style.css'
 import { ElMessage } from 'element-plus'
+import {
+  createPPT,
+  getMultimedia,
+  isExist,
+  lessonHourPreparationGetTeachingContentByIdService, saveMultimedia
+} from '@/api/lessonHourPreparationLesson.js'
 
 
-const teacherScheduleId = useRoute().params.teacherScheduleId
+const teacherScheduleId = useRoute().params.teacherScheduleId;
+
+//多媒体资源对象
+const multimedia = ref({
+  pptUrl:'',
+  videoUrl:[],
+  imagesUrl:[]
+})
+
 
 //备课
-const lessonPreparation = ref({
-
-})
+const lessonPreparation = ref({})
 const AiGenerateTeachingSign = ref({
   topic: '',
   teachingContentArrangementStr: '',
@@ -51,34 +66,73 @@ onMounted(async () => {
 })
 
 //获取多媒体资源
-const getMultimedia=async ()=>{
-  //todo 判断教学内容是否生成
+const handleGetMultimedia=async ()=>{
   // const res= await (teacherScheduleId);
-  const res=false;
+  const res=await handleTeacherContentIsExist();
   //说明教学内容已经存在
+
   if(res){
-    //todo 获取多媒体资源
+    ElMessage.success("教学内容已经生成");
+    const isExistMultimedia = await handleMultimediaIsExist();
+    if(isExistMultimedia==null || isExistMultimedia.pptUrl=='' || isExistMultimedia.videoUrl=='' || isExistMultimedia.imagesUrl==''){
+      const teachContent=await  handleGetTeachingContent();
+      //生成ppt
+      multimedia.value.pptUrl= await handleCreateMultimedia(teachContent);
+      console.log(multimedia.value.ppt);
+      //生成图片
+
+      //推荐视频
+
+      //保存到数据库
+      await handleSaveMultimedia();
+      ElMessage.success("多媒体资源保存成功");
+    }else{
+      router.push(`/lesson/lesson_hour/multimedia/ppt/${teacherScheduleId}`);
+      ElMessage.error("多媒体资源已经生成");
+    }
     // createMultimedia(teacherScheduleId);
   }else{
     ElMessage.error('请先生成教学内容');
   }
 }
 
-//获取备课
-const getLessonPreparation = async () => {
-  const res = await chapterLessonPreparationGetListByIdService(teacherScheduleId)
+// 生成多媒体资源
+const handleCreateMultimedia=async (teachContent)=>{
+  const pptUrl=await createPPT(teachContent);
+  return pptUrl.msg;
+}
+
+
+//保存多媒体资源
+const handleSaveMultimedia=async ()=>{
+  await saveMultimedia(teacherScheduleId,multimedia.value);
+   // console.log(res);
+   // ElMessage.success("多媒体资源已经生成");
+
+}
+//获取教学内容来生成ppt
+const handleGetTeachingContent=async ()=>{
+  const teachContentRes= await lessonHourPreparationGetTeachingContentByIdService(teacherScheduleId);
+  // console.log(teachContentRes.msg);
+  return teachContentRes.msg;
+}
+
+
+//判断多媒体资源是否存在
+const  handleMultimediaIsExist=async ()=>{
+  fullscreenLoading.value = true;
+  const res = await getMultimedia(teacherScheduleId)
   console.log(res)
-  lessonPreparation.value = res.data
-}
-getLessonPreparation()
-//获取教学贴士
-const getTeachingTips = async () => {
-  const res = await chapterLessonPreparationGetListByIdService(teacherScheduleId)
-  console.log(res);
-  lessonPreparation.value = res.data
+  return res.data;
 }
 
-
+// 判断教学内容是否生成
+const handleTeacherContentIsExist = async () => {
+  fullscreenLoading.value = true;
+  const res = await isExist(teacherScheduleId)
+  console.log(res)
+  return res.data;
+}
 
 const goAiGenerate = async () => {
   fullscreenLoading.value = true;
@@ -112,11 +166,12 @@ const goToTimeAllocation = () => {
 const goToExpectedResults = () => {
   router.push(`/lesson/lesson_hour/mylessonpreparation/ExpectedResult/${teacherScheduleId}`)
 }
+
 //前往多媒体资源
 const goToMultimedia= () => {
   router.push(`/lesson/lesson_hour/multimedia/ppt/${teacherScheduleId}`)
 }
-
+//前往教学内容
 const goToTeachingContent = () => {
   router.push(`/lesson/lesson_hour/mylessonpreparation/TeachingContent/${teacherScheduleId}`)
 }
@@ -253,7 +308,7 @@ const teachingTips = [
           <div class="tools-panel">
             <h3>教学工具</h3>
             <div class="tool-buttons">
-              <el-button class="tool-btn" type="primary" plain style="margin-left: 10px;" @click="getMultimedia">
+              <el-button class="tool-btn" type="primary" plain style="margin-left: 10px;" @click="handleGetMultimedia">
                 <el-icon><VideoCamera /></el-icon>
                 多媒体资源生成
               </el-button>

@@ -93,7 +93,7 @@ export default {
           lang: option.lang, //语言设置
           //定制
           customization: {
-            autosave: false, //是否自动保存
+            autosave: true, //是否自动保存
             chat: false,
             comments: false,
             help: false,

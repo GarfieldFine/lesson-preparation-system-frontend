@@ -123,3 +123,31 @@ export const aiGenerationApproximateTeachingContentService = (teacherScheduleId)
 export const aiGenerationApproximateExpectedResultService = (teacherScheduleId) => {
   return request.post(`/LessonHourPreparation/ai/approximate/expectedResult/${teacherScheduleId}`)
 }
+
+// 判断教学内容是否存在
+export const isExist = (teacherScheduleId) => {
+  return request.get(`/LessonHourPreparation/isexist/${teacherScheduleId}`)
+}
+
+//获取多媒体资源
+export const getMultimedia = (teacherScheduleId) => {
+  return request.get(`/LessonHourPreparation/get/multimedia/${teacherScheduleId}`)
+}
+
+//生成ppt资源
+export const createPPT = (teachingContent) => {
+  return request.post('/multimedia/ppt',{
+    teachingContent
+  })
+}
+
+//推荐视频资源
+
+//生成图片资源
+
+
+//保存多媒体资源
+export const saveMultimedia = (teacherScheduleId,multimedia) => {
+  console.log(multimedia);
+  return request.post(`/LessonHourPreparation/save/multimedia/${teacherScheduleId}`,multimedia)
+}
