@@ -533,7 +533,9 @@ const generateAIContent = async () => {
   try {
     // 模拟API调用
     const res = await aiGenerationApproximateTeachingContentService(teacherScheduleId)
+    console.log(res.data)
     lessonData.value.mainContent = res.data.mainTeachContent
+    console.log(res.data.teachContent)
     teachContents.value = res.data.teachContent
     ElMessage.success('内容生成成功')
     generatingContent.value = false

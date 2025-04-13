@@ -9,7 +9,7 @@ export const lessonPreparationRecordAddGetService = ({courseId,classId,startLess
 }
 
 export const lessonPreparationRecordGetGetService = (teacherId) => {
-  return request.get(`/lessonPreparationRecord/getByTeacherId/${teacherId}`)
+  return request.get(`/lessonPreparationRecord/get/${teacherId}`)
 }
 
 export const lessonPreparationRecordGetClassNameService = (id) => {
@@ -49,4 +49,5 @@ export const lessonPreparationRecordUpdateTeachingPlanningService = (lessonPrepa
     }
   })
 }
+
 

@@ -8,41 +8,59 @@
 </template>
 
 <script>
-import vabOnlyOffice from "/src/views/multimedia/multimediaUtils/vanOnkyOffice.vue";
-import MultimediaNav from "./components/MultimediaNav.vue";
+import { ref, onMounted } from 'vue';
+import { getMultimedia } from '@/api/lessonHourPreparationLesson.js';
+import VabOnlyOffice from '@/views/multimedia/multimediaUtils/vanOnkyOffice.vue';
+import MultimediaNav from '@/views/multimedia/components/MultimediaNav.vue';
+import { useRoute } from 'vue-router';
 
 export default {
-  name: "QualityManual",
-  components: { vabOnlyOffice, MultimediaNav },
+  components: { MultimediaNav, VabOnlyOffice },
+  setup() {
+    const route = useRoute();
+    const teacherScheduleId = route.params.teacherScheduleId;
+    const option = ref({
+      url: "",
+      isEdit: "",
+      fileType: "",
+      title: "",
+      lang: "",
+      isPrint: "",
+    });
 
-  data() {
-    return {
-      //参考vabOnlyOffice组件参数配置
-      option: {
-        url: "",
-        isEdit: "",
-        fileType: "",
-        title: "",
-        lang: "",
-        isPrint: "",
-      },
+    const multimedia = ref({
+      pptUrl: '',
+      videoUrl: [],
+      imagesUrl: []
+    });
+
+    const getFile = () => {
+      // console.log(multimedia.value.pptUrl);
+      // 模拟获取文件信息的异步操作
+      option.value.isEdit = true;
+      option.value.lang = "en";
+      option.value.url = multimedia.value.pptUrl;
+      option.value.title = "123";
+      option.value.fileType = "pptx";
+      option.value.isPrint = false;
     };
-  },
-  methods: {
-    getFile() {
-      // getAction('/onlyfile/file/queryById', { id: this.id }).then(res => {
-      this.option.isEdit = true;
-      this.option.lang = "en";
-      this.option.url ="https://bjcdn.openstorage.cn/xinghuo-privatedata/zhiwen/2025-04-04/6a463b60-75b4-4552-a48f-4ff1a094a5f0/f4aeabff35764ce2938aeb8d777cef9b.pptx";
-      this.option.title = "123";
-      this.option.fileType = "pptx";
-      this.option.isPrint = false;
-      // })
-    },
-  },
-  mounted() {
-    this.getFile();
-  },
+
+    const handleGetMultimedia = async () => {
+      const res = await getMultimedia(teacherScheduleId);
+      multimedia.value = res.data;
+      console.log(multimedia.value.pptUrl);
+    };
+
+    onMounted(async () => {
+      await handleGetMultimedia();
+      getFile();
+    });
+
+    return {
+      option,
+      multimedia
+    };
+  }
 };
 </script>
 
