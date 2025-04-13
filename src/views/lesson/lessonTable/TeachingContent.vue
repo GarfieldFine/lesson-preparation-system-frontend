@@ -83,9 +83,11 @@ import { ref, computed, onMounted, onUnmounted, watch, nextTick, h } from 'vue'
 import { MdPreview } from 'md-editor-v3'
 import router from '@/router'
 import 'md-editor-v3/lib/style.css'
-import { lessonHourPreparationGetTeachingContentByIdService,
+import {
+  lessonHourPreparationGetTeachingContentByIdService,
   lessonHourPreparationAiReviseTeachingContentService,
-  lessonHourPreparationSaveTeachingContentService }
+  lessonHourPreparationSaveTeachingContentService, createPPT, saveMultimedia, getMultimedia
+}
   from '@/api/lessonHourPreparationLesson.js'
 import { useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
@@ -96,6 +98,12 @@ const contentRef = ref(null)
 
 // 初始化为空字符串
 let markdownContent = ref('')
+//多媒体资源对象
+const multimedia = ref({
+  pptUrl:'',
+  videoUrl:[],
+  imagesUrl:[]
+})
 
 const Notification1 = () => {
   ElNotification({
@@ -443,8 +451,53 @@ const isGeneratingMedia = ref(false)
 
 // 添加多媒体资源生成功能
 const generateMedia = async () => {
+  const isExistMultimedia = await handleMultimediaIsExist();
+  if(isExistMultimedia==null || isExistMultimedia.pptUrl=='' || isExistMultimedia.videoUrl=='' || isExistMultimedia.imagesUrl==''){
+    const teachContent=await  handleGetTeachingContent();
+    //生成ppt
+    multimedia.value.pptUrl= await handleCreateMultimedia(teachContent);
+    // console.log(multimedia.value.ppt);
+    //生成图片
+
+    //推荐视频
+
+    //保存到数据库
+    await handleSaveMultimedia();
+    ElMessage.success("多媒体资源保存成功");
+  }else{
+    router.push(`/lesson/lesson_hour/multimedia/ppt/${teacherScheduleId}`);
+    // ElMessage.error("多媒体资源已经生成");
+  }
+}
+// 生成多媒体资源
+const handleCreateMultimedia=async (teachContent)=>{
+  const pptUrl=await createPPT(teachContent);
+  return pptUrl.msg;
+}
+
+
+//保存多媒体资源
+const handleSaveMultimedia=async ()=>{
+  await saveMultimedia(teacherScheduleId,multimedia.value);
+  // console.log(res);
+  // ElMessage.success("多媒体资源已经生成");
 
 }
+//获取教学内容来生成ppt
+const handleGetTeachingContent=async ()=>{
+  const teachContentRes= await lessonHourPreparationGetTeachingContentByIdService(teacherScheduleId);
+  // console.log(teachContentRes.msg);
+  return teachContentRes.msg;
+}
+
+
+//判断多媒体资源是否存在
+const  handleMultimediaIsExist=async ()=>{
+  const res = await getMultimedia(teacherScheduleId)
+  console.log(res)
+  return res.data;
+}
+
 </script>
 
 <style scoped>

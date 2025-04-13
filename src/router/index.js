@@ -6,7 +6,7 @@ const router = createRouter({
     { path: '/login', component: () => import('@/views/login/LoginPage.vue') },
     { path: '/index', component: () => import('@/views/index.vue') },
     {
-      path: '/lesson/lesson_hour/multimedia/ppt',
+      path: '/lesson/lesson_hour/multimedia/ppt/:teacherScheduleId',
       component: () => import('@/views/multimedia/PPT.vue')
     },
     {
