@@ -436,3 +436,73 @@ export default {
 .tag {
   background-color: #f5f7fa;
   color: #606266;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.related-videos {
+  margin-top: 24px;
+}
+
+.related-videos h4 {
+  font-size: 18px;
+  margin-bottom: 16px;
+  color: #333;
+}
+
+.related-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.related-video-item {
+  display: flex;
+  gap: 12px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.related-video-item:hover {
+  background-color: #f5f7fa;
+}
+
+.related-thumbnail {
+  position: relative;
+  width: 120px;
+  height: 68px;
+  border-radius: 4px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.related-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.related-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.related-info h5 {
+  margin: 0;
+  font-size: 14px;
+  color: #333;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.related-info .views {
+  font-size: 12px;
+  color: #909399;
+}
+</style>
