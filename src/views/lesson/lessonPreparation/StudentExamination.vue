@@ -1,6 +1,6 @@
 <template>
   <div class="examination-container">
-    <div v-if="isExamSubmitted === 2" class="exam-waiting-container glass-card">
+    <div v-if="+isExamSubmitted === 2" class="exam-waiting-container glass-card">
       <div class="waiting-content">
         <div class="waiting-icon">
           <el-icon><Loading /></el-icon>
@@ -14,7 +14,7 @@
     </div>
 
     <!-- 考试结果展示组件 -->
-    <div v-if="isExamSubmitted === 1" class="exam-result-container glass-card">
+    <div v-if="+isExamSubmitted === 1" class="exam-result-container glass-card">
       <div class="result-header">
         <h1>{{ examData.examName || '期末考试' }} - 考试结果</h1>
         <div class="result-meta">
@@ -52,12 +52,12 @@
             <span>{{ scoreLevel.text }}</span>
           </div>
 
-<!--          <div class="result-message">-->
-<!--            <p v-if="scorePercentage >= 90">太棒了！你的表现非常出色，继续保持！</p>-->
-<!--            <p v-else-if="scorePercentage >= 75">做得很好！再接再厉，你会做得更好！</p>-->
-<!--            <p v-else-if="scorePercentage >= 60">恭喜通过考试！多加练习，成绩会更上一层楼！</p>-->
-<!--            <p v-else>别灰心！失败是成功之母，继续努力！</p>-->
-<!--          </div>-->
+          <!--          <div class="result-message">-->
+          <!--            <p v-if="scorePercentage >= 90">太棒了！你的表现非常出色，继续保持！</p>-->
+          <!--            <p v-else-if="scorePercentage >= 75">做得很好！再接再厉，你会做得更好！</p>-->
+          <!--            <p v-else-if="scorePercentage >= 60">恭喜通过考试！多加练习，成绩会更上一层楼！</p>-->
+          <!--            <p v-else>别灰心！失败是成功之母，继续努力！</p>-->
+          <!--          </div>-->
           <div class="result-message">
             <p>{{aiAnalysis}}</p>
           </div>
@@ -90,7 +90,7 @@
       </div>
     </div>
     <!-- 以下内容只在未提交考试时显示 -->
-    <template v-if="isExamSubmitted === 0">
+    <template v-if="+isExamSubmitted === 0">
       <!-- 顶部考试信息和倒计时 -->
       <div class="exam-header glass-card" style="margin-right: 100px;margin-left: 100px;">
         <div class="exam-info">
@@ -101,6 +101,20 @@
               考试中
             </el-tag>
             <span class="total-questions">共 {{ examData.questions.length }} 题</span>
+          </div>
+        </div>
+
+        <!-- 摄像头监控组件 -->
+        <div class="camera-container" v-if="showCamera">
+          <video id="video" width="120px" height="120px" autoplay="autoplay"></video>
+          <canvas id="canvas" width="120px" height="120px" style="display: none;"></canvas>
+          <div class="camera-controls">
+            <el-button size="small" type="primary" @click="toggleCamera" :icon="cameraActive ? 'Close' : 'VideoCamera'">
+              {{ cameraActive ? '关闭摄像头' : '开启摄像头' }}
+            </el-button>
+            <el-button size="small" type="success" @click="takePhoto" :disabled="!cameraActive">
+              <el-icon><Camera /></el-icon> 拍照
+            </el-button>
           </div>
         </div>
 
@@ -379,9 +393,14 @@ import {
   WarningFilled,
   Collection,
   Reading,
-  Loading
+  Loading,
+  VideoCamera,
+  Camera
 } from '@element-plus/icons-vue'
-import { getQuestionsByExamQuestionGroupsIdControllerService } from '@/api/ExamQuestionGroup.js'
+import {
+  getQuestionsByExamQuestionGroupsIdControllerService,
+  lessonPreparationRecordGetByIdService
+} from '@/api/ExamQuestionGroup.js'
 import { submitExamAnswerService } from '@/api/studentExamRecord.js'
 
 const route = useRoute()
@@ -425,6 +444,77 @@ const submitConfirmVisible = ref(false)
 
 // 页面离开警告
 const pageLeaveWarningEnabled = ref(true)
+
+// 摄像头相关
+const showCamera = ref(true) // 是否显示摄像头组件
+const cameraActive = ref(false) // 摄像头是否激活
+const mediaStream = ref(null) // 媒体流
+
+// 开启/关闭摄像头
+const toggleCamera = () => {
+  if (cameraActive.value) {
+    stopCamera()
+  } else {
+    startCamera()
+  }
+}
+
+// 开启摄像头
+const startCamera = () => {
+  const constraints = {
+    video: {width: 500, height: 500},
+    audio: false // 考试监控不需要音频
+  }
+
+  const video = document.getElementById('video')
+
+  navigator.mediaDevices.getUserMedia(constraints)
+    .then((stream) => {
+      video.srcObject = stream
+      mediaStream.value = stream
+      video.play()
+      cameraActive.value = true
+    })
+    .catch((err) => {
+      console.error('摄像头启动失败:', err)
+      ElMessage.error('摄像头启动失败，请检查设备权限')
+    })
+}
+
+// 关闭摄像头
+const stopCamera = () => {
+  const video = document.getElementById('video')
+
+  if (mediaStream.value) {
+    const tracks = mediaStream.value.getTracks()
+    tracks.forEach((track) => {
+      track.stop() // 停止视频流
+    })
+
+    video.srcObject = null
+    mediaStream.value = null
+    cameraActive.value = false
+  }
+}
+
+// 拍照功能
+const takePhoto = () => {
+  if (!cameraActive.value) return
+
+  const video = document.getElementById('video')
+  const canvas = document.getElementById('canvas')
+  const ctx = canvas.getContext('2d')
+
+  // 绘制视频帧到画布
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
+
+  // 可以在这里添加将照片保存或上传到服务器的逻辑
+  // 例如：
+  // const imageData = canvas.toDataURL('image/png')
+  // 上传imageData到服务器
+
+  ElMessage.success('已拍照记录')
+}
 
 // 获取题目类型名称
 const getQuestionTypeName = (type) => {
@@ -561,10 +651,10 @@ const scoreLevel = computed(() => {
 const loadExamData = async () => {
   try {
     // 这里调用API获取考试数据
-    const res = await getQuestionsByExamQuestionGroupsIdControllerService(6)
-
+    const res = await lessonPreparationRecordGetByIdService(examId)
+    console.log(res.data)
     // 检查学生是否已提交过考试
-    if (res.data.isSubmit === 1) {
+    if (+res.data.isSubmit === 1) {
       // 学生已完成考试，只显示分数
       // isExamSubmitted.value = true
       isExamSubmitted.value = 1
@@ -579,7 +669,6 @@ const loadExamData = async () => {
     examData.examName = res.data.title
     examData.duration = res.data.duration
     examData.questions = res.data.questions
-
     // 初始化用户答案数组
     userAnswers.length = examData.questions.length
 
@@ -741,6 +830,11 @@ onMounted(async () => {
 
       // 移除路由守卫
       unwatch()
+
+      // 关闭摄像头
+      if (cameraActive.value) {
+        stopCamera()
+      }
     })
 
   }
@@ -1751,6 +1845,31 @@ onMounted(async () => {
   0% { box-shadow: 10014px 0 0 -5px; }
   30% { box-shadow: 10014px 0 0 2px; }
   60%, 100% { box-shadow: 10014px 0 0 -5px; }
+}
+
+/* 摄像头组件样式 */
+.camera-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+#video {
+  border-radius: 8px;
+  border: 2px solid #4f46e5;
+  background-color: #f0f0f0;
+  object-fit: cover;
+}
+
+.camera-controls {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
 }
 
 /* 响应式布局 */

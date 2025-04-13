@@ -4,7 +4,7 @@ import { teacherScheduleGetListByLessonPreparationRecIdService } from '@/api/tea
 import {
   lessonPreparationRecordGetClassNameService,
   lessonPreparationRecordAddClassService,
-  getLessonPreparationRecordByIdService
+  getLessonPreparationRecordByIdService, lessonPreparationRecordUpdateTeachingPlanningService
 } from '@/api/lessonPreparationRecord.js'
 import { classGetAllNameService } from '@/api/class.js'
 import { useRoute, useRouter } from 'vue-router'
@@ -36,6 +36,99 @@ onMounted(async () => {
   isFinish.value = res3.data.teachingState
 
 })
+
+const editDialogVisible = ref(false)
+const currentLesson = ref(null)
+const newTeachingPlanning = ref('')
+
+
+// 修改ref定义
+const popoverVisible = ref(false)
+const popoverTriggerRef = ref(null)
+
+// 修改打开方法
+const openEditPopover = (lesson, event) => {
+  currentLesson.value = lesson
+  newTeachingPlanning.value = lesson.teachingPlanning || ''
+  popoverTriggerRef.value = event.currentTarget
+  popoverVisible.value = true
+}
+const handleSelectClick = (e) => {
+  e.stopPropagation()
+  e.preventDefault()  // 添加这行确保完全阻止默认行为
+}
+
+// 修改关闭方法
+const closePopover = () => {
+  popoverVisible.value = false
+}
+
+//更新课时对应的章节
+const updateTeachingPlanning = async () => {
+  if (!currentLesson.value || !newTeachingPlanning.value) return
+
+  try {
+    console.log(currentLesson.value.id, newTeachingPlanning.value)
+    await lessonPreparationRecordUpdateTeachingPlanningService(
+      currentLesson.value.id,
+      newTeachingPlanning.value
+    )
+    console.log('修改成功')
+    ElMessage.success('修改成功')
+    editDialogVisible.value = false
+    popoverVisible.value = false
+    // 刷新数据
+    const res = await teacherScheduleGetListByLessonPreparationRecIdService(LessonPreparationRecId)
+    lessonPreparationList.value = res.data
+  } catch (error) {
+    ElMessage.error('修改失败')
+  }
+}
+
+// 添加计算属性获取所有章节列表
+const teachingPlannings = computed(() => {
+  const plannings = new Set()
+  let currentIndex = -1
+
+  // 获取所有章节并确定当前章节位置
+  const allPlannings = []
+  lessonPreparationList.value.forEach(lesson => {
+    if (lesson.teachingPlanning) {
+      allPlannings.push(lesson.teachingPlanning)
+      if (currentLesson.value && lesson.id === currentLesson.value.id) {
+        currentIndex = allPlannings.length - 1
+      }
+    }
+  })
+
+  // 只保留当前章节之后的章节
+  if (currentIndex >= 0) {
+    for (let i = currentIndex + 1; i < allPlannings.length; i++) {
+      plannings.add(allPlannings[i])
+    }
+  } else {
+    // 如果没有当前章节，返回所有章节
+    allPlannings.forEach(planning => plannings.add(planning))
+  }
+  return Array.from(plannings)
+})
+
+const handleSelectChange = (value) => {
+  // 这里不需要阻止事件，因为change事件不会导致弹出层关闭
+  newTeachingPlanning.value = value
+}
+
+const getPopoverPosition = () => {
+  return {
+    position: 'fixed',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: '400px', // 保持原有宽度
+    maxWidth: '90%', // 保持最大宽度
+    animation: 'popover-fade-in 0.3s ease' // 保持动画效果
+  }
+}
 
 // 使用计算属性将数组转换成字符串
 const classesString = computed(() => {
@@ -301,11 +394,60 @@ const goToTeachingPlan = (chapterId) => {
                   <div class="status-badge" :class="[new Date(lesson.fullClassTime) < new Date() ? 'completed' : 'upcoming']">
                     {{ new Date(lesson.fullClassTime) < new Date() ? '已上' : '未上' }}
                   </div>
+                  <!-- new Date(lesson.fullClassTime) >= new Date() -->
+                  <!-- 修改课时卡片中的按钮 -->
+                  <el-button
+                    v-if="true"
+                    class="edit-button"
+                    size="small"
+                    @click.stop="openEditPopover(lesson, $event)"
+                  >
+                    修改
+                  </el-button>
+
                   <div class="action-button">
                     <i class="el-icon-right"></i>
                   </div>
                 </div>
               </div>
+              <!-- 添加弹出层 -->
+              <teleport to="body" v-if="popoverVisible">
+                <div  class="popover-overlay">
+                  <div class="popover-content" :style="getPopoverPosition()">
+                    <div class="popover-header">
+                      <h3>修改课时章节</h3>
+                      <i class="el-icon-close" @click="closePopover"></i>
+                    </div>
+                    <div class="popover-body">
+                      <el-select
+                        v-model="newTeachingPlanning"
+                        placeholder="请选择章节"
+                        class="teaching-planning-select"
+                        @change="handleSelectChange"
+                        @click.native.stop="handleSelectClick"
+                      >
+                        <el-option
+                          v-for="planning in teachingPlannings"
+                          :key="planning"
+                          :label="planning"
+                          :value="planning"
+                        />
+                      </el-select>
+                    </div>
+                    <div class="popover-footer">
+                      <el-button plain class="cancel-button" @click="closePopover">取消</el-button>
+                      <el-button
+                        type="primary"
+                        class="confirm-button"
+                        @click="updateTeachingPlanning"
+                        :disabled="!newTeachingPlanning"
+                      >
+                        确认修改
+                      </el-button>
+                    </div>
+                  </div>
+                </div>
+              </teleport>
             </div>
           </transition>
         </div>
@@ -1299,6 +1441,87 @@ const goToTeachingPlan = (chapterId) => {
     }
   }
 }
+.popover-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.002);
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.popover-content {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.001);
+  width: 400px;
+  max-width: 90%;
+  animation: popover-fade-in 0.3s ease;
+  border: 1px solid #e2e8f0;
+}
+
+.popover-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  h3 {
+    margin: 0;
+    font-size: 16px;
+    color: #333;
+  }
+
+  .el-icon-close {
+    cursor: pointer;
+    color: #999;
+    font-size: 18px;
+
+    &:hover {
+      color: #666;
+    }
+  }
+}
+
+.popover-body {
+  padding: 20px;
+}
+
+.popover-footer {
+  padding: 12px 20px;
+  border-top: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+@keyframes popover-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// 保持原有的select样式
+.teaching-planning-select {
+  width: 100%;
+
+  :deep(.el-input__wrapper) {
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    padding: 0.5rem 1rem;
+  }
+}
+
 </style>
 
 <!-- 添加全局样式 -->
@@ -1445,5 +1668,9 @@ const goToTeachingPlan = (chapterId) => {
       margin: 0;
     }
   }
+}
+.edit-button{
+  background-color: rgb(242, 174, 184);
+  border-radius: 50px;
 }
 </style>

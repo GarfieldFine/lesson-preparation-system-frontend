@@ -22,31 +22,9 @@ const handleClose = () => {
           @close="handleClose"
           router
         >
-          <el-sub-menu index="1">
-            <template #title>
-              <el-icon>
-                <Notebook />
-              </el-icon>
-              <span>备课</span>
-            </template>
-
-            <el-menu-item index="/lesson/mylessonpreparation/practice">学生练习题</el-menu-item>
-            <el-menu-item index="/lesson/student/practice">做题</el-menu-item>
-            <el-menu-item index="/lesson/student-feedback">学生反馈</el-menu-item>
-            <el-menu-item index="/lesson/student/exam">考试</el-menu-item>
-
-          </el-sub-menu>
-          <el-sub-menu index="2">
-            <template #title>
-              <el-icon>
-                <Calendar />
-              </el-icon>
-              <span>课表</span>
-            </template>
-            <el-menu-item index="/lesson/lessontable">我的课表</el-menu-item>
-            <el-menu-item index="/lesson/lesson_hour/mylessonpreparation">课时备课本</el-menu-item>
-            <el-menu-item index="/lesson/mylessonpreparation">章节备课本</el-menu-item>
-          </el-sub-menu>
+          <el-menu-item index="/lesson/lessontable">我的课表</el-menu-item>
+          <el-menu-item index="/lesson/lesson_hour/mylessonpreparation">课时备课本</el-menu-item>
+          <el-menu-item index="/lesson/mylessonpreparation">章节备课本</el-menu-item>
         </el-menu>
       </el-aside>
       <el-main style="width: 100%;padding: 0;overflow-y: auto;">

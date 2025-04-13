@@ -15,3 +15,7 @@ export const getCourseChaptersService = (lessonPreparationRecordId) => {
 export const confirmAiGenerateExamQuestionService = (examQuestionGroupId) => {
   return request.get(`/examQuestion/confirm/${examQuestionGroupId}`)
 }
+
+export const lessonPreparationRecordGetByIdService = (studentExamRecordId) => {
+  return request.post(`/examQuestion/getById/${studentExamRecordId}`)
+}
