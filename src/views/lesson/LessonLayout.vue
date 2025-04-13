@@ -29,14 +29,10 @@ const handleClose = () => {
               </el-icon>
               <span>备课</span>
             </template>
-            <el-menu-item index="/lesson/mylessonpreparation">我的备课本</el-menu-item>
+
             <el-menu-item index="/lesson/mylessonpreparation/practice">学生练习题</el-menu-item>
             <el-menu-item index="/lesson/student/practice">做题</el-menu-item>
             <el-menu-item index="/lesson/student-feedback">学生反馈</el-menu-item>
-            <el-menu-item index="/lesson/teachingPlan">教案</el-menu-item>
-            <el-menu-item index="/lesson/student/questionBank">学生题库</el-menu-item>
-            <el-menu-item index="/lesson/lesson_hour/studentDetail">学生详情</el-menu-item>
-            <el-menu-item index="/lesson/examGen">生成考试内容</el-menu-item>
             <el-menu-item index="/lesson/student/exam">考试</el-menu-item>
 
           </el-sub-menu>
@@ -53,7 +49,7 @@ const handleClose = () => {
           </el-sub-menu>
         </el-menu>
       </el-aside>
-      <el-main style="width: 100%;padding: 0">
+      <el-main style="width: 100%;padding: 0;overflow-y: auto;">
         <router-view></router-view>
       </el-main>
     </el-container>
@@ -68,7 +64,7 @@ const handleClose = () => {
 
   .el-card__body {
     //height: 1000px;
-    //height: 100%;
+    height: 100%;
     width: 100%;
   }
 

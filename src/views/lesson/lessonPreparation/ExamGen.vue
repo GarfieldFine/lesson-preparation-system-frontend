@@ -349,6 +349,7 @@ import { PieChart } from 'echarts/charts';
 import { TitleComponent, TooltipComponent, LegendComponent } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
 import { format } from 'date-fns';
+import { useRoute } from 'vue-router'
 import {
   AiGenerateExamQuestionService,
   getQuestionsByExamQuestionGroupsIdControllerService,
@@ -362,6 +363,8 @@ echarts.use([PieChart, TitleComponent, TooltipComponent, LegendComponent, Canvas
 const  examQuestionGroupId = ref();
 
 const loadingChapters = ref(true);
+
+const lessonPreparationRecordId = useRoute().params.lessonPreparationRecordId
 
 const examConfigTypeOptions = [
   { label: '期中考试', value: 0 },
@@ -515,7 +518,7 @@ const generateExamOutline = async () => {
       chapters: examConfig.selectedChapters
     };
 
-    setDefaultOutline();
+    // setDefaultOutline();
 
     // const res = await AiGenerateExamOutlineService(outlineData);
     // const res = '';
@@ -573,6 +576,7 @@ const generateExam = async () => {
 
     try {
       // 准备考试数据
+      examData.lessonPreparationRecordId = lessonPreparationRecordId;
       examData.title = examConfig.examName;
       examData.questionTotalTime = examConfig.duration;
       examData.difficulty = examConfig.difficulty;

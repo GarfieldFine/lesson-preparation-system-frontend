@@ -100,7 +100,7 @@ import * as echarts from 'echarts'
 
 
 import { useRoute, useRouter } from 'vue-router'
-import { analysisStudentPostLessonFeedback } from '@/api/feedback.js'
+import { analysisStudentPostLessonFeedback, getWordCloudInfo } from '@/api/feedback.js'
 import WordCloud from '@/views/component/WordCloud.vue'
 
 const router = useRouter()
@@ -249,7 +249,7 @@ const formatAiSummary = (text) => {
 
   return formatted;
 }
-const predefinedKeywords = [
+const predefinedKeywords = ref([
   { name: '课程内容', value: 3000 },
   { name: '讲解清晰', value: 2800 },
   { name: '实践环节', value: 2600 },
@@ -272,7 +272,7 @@ const predefinedKeywords = [
   { name: '提问方式', value: 300 },
   { name: '反馈及时', value: 250 },
   { name: '学习效果', value: 200 }
-];
+]);
 
 // 初始化词云图
 const initWordCloudChart = () => {
@@ -309,7 +309,7 @@ const initWordCloudChart = () => {
             shadowColor: '#333'
           }
         },
-        data: predefinedKeywords
+        data: predefinedKeywords.value
       }]
     };
 
@@ -330,6 +330,8 @@ onMounted(async () => {
     initSatisfactionChart(res.data)
     initParticipationChart(res.data)
     // 确保即使没有反馈数据也能显示词云图
+    const res1 = await getWordCloudInfo()
+    predefinedKeywords.value = res1.data
     initWordCloudChart()
     studentFeedbacks.value = res.data.studentFeedbacks
     aiSummary.value = res.data.aiSummary

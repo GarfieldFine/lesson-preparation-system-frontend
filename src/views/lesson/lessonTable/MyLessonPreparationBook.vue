@@ -146,6 +146,12 @@ const goToTeachingCalendar = () => {
 // 实际实现可以使用 router.push 进行路由跳转
   router.push(`/lesson/teachingCalendar/${LessonPreparationRecId}`)
 }
+const goToExamGen = () => {
+// 这里是跳转到教学日历页面的逻辑
+  console.log('跳转到考试试卷逻辑生成')
+// 实际实现可以使用 router.push 进行路由跳转
+  router.push(`/lesson/examGen/${LessonPreparationRecId}`)
+}
 
 // 打开教案章节列表弹窗
 const openTeachingPlanDialog = async () => {
@@ -209,6 +215,9 @@ const goToTeachingPlan = (chapterId) => {
           </el-button>
           <el-button v-if="isFinish === 0" type="success" class="teaching-tool-button" @click="openTeachingPlanDialog">
             <i class="el-icon-document"></i> 教案
+          </el-button>
+          <el-button type="warning" class="teaching-tool-button" @click="goToExamGen">
+            <i class="el-icon-date"></i> 考试试卷生成
           </el-button>
           <el-button type="primary" class="add-class-button" @click="dialogFormVisible = true">
             <i class="el-icon-plus"></i> 添加班级

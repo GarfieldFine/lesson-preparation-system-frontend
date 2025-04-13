@@ -123,3 +123,7 @@ export const aiGenerationApproximateTeachingContentService = (teacherScheduleId)
 export const aiGenerationApproximateExpectedResultService = (teacherScheduleId) => {
   return request.post(`/LessonHourPreparation/ai/approximate/expectedResult/${teacherScheduleId}`)
 }
+// ai生成全部大致内容
+export const getByTeacherScheduleIdService = (teacherScheduleId) => {
+  return request.post(`/LessonHourPreparation/getByTeacherScheduleId/${teacherScheduleId}`)
+}

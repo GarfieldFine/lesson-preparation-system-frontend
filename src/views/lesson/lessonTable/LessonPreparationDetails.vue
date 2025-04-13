@@ -23,6 +23,7 @@ import 'md-editor-v3/lib/preview.css';
 
 import 'md-editor-v3/lib/style.css';
 import { ElMessage } from 'element-plus'
+import { getByTeacherScheduleIdService } from '@/api/lessonHourPreparationLesson.js'
 
 
 const teacherScheduleId = useRoute().params.teacherScheduleId
@@ -48,10 +49,11 @@ const teachingSignDto = ref({
 const router = useRouter()
 
 onMounted(async () => {
+  await getLessonPreparation()
 })
 
 //获取多媒体资源
-const getMultimedia=async ()=>{
+const getMultimedia= async ()=>{
   //todo 判断教学内容是否生成
   // const res= await (teacherScheduleId);
   const res=false;
@@ -64,21 +66,12 @@ const getMultimedia=async ()=>{
   }
 }
 
-//获取备课
+// 获取备课
 const getLessonPreparation = async () => {
-  const res = await chapterLessonPreparationGetListByIdService(teacherScheduleId)
+  const res = await getByTeacherScheduleIdService(teacherScheduleId)
   console.log(res)
   lessonPreparation.value = res.data
 }
-getLessonPreparation()
-//获取教学贴士
-const getTeachingTips = async () => {
-  const res = await chapterLessonPreparationGetListByIdService(teacherScheduleId)
-  console.log(res);
-  lessonPreparation.value = res.data
-}
-
-
 
 const goAiGenerate = async () => {
   fullscreenLoading.value = true;
@@ -172,11 +165,11 @@ const teachingTips = [
     <div class="page-header">
       <div class="header-content">
         <div class="title-section">
-          <h1>{{ lessonPreparation.chapterName }}</h1>
+          <h1>{{ lessonPreparation.chapterTitle }}</h1>
           <div class="lesson-meta">
             <span class="meta-item">
               <el-icon><Clock /></el-icon>
-              课时：{{ AiGenerateTeachingSign.numberOfLessons }} 课时
+              课时：{{ lessonPreparation.lessonHour }} 课时
             </span>
             <span class="meta-item">
               <el-icon><Calendar /></el-icon>

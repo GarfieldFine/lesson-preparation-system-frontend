@@ -20,9 +20,9 @@
           <label>班级:</label>
           <select v-model="statsFilter.class">
             <option value="all">全部班级</option>
-            <option value="class1">高一(1)班</option>
-            <option value="class2">高一(2)班</option>
-            <option value="class3">高一(3)班</option>
+            <option value="class1">计算机科学与技术1班</option>
+<!--            <option value="class2">高一(2)班</option>-->
+<!--            <option value="class3">高一(3)班</option>-->
           </select>
         </div>
         <div class="filter-group">
@@ -42,7 +42,7 @@
           <div class="stats-card-header">
             <h3>题目回答频次排行</h3>
             <div class="card-actions">
-              <i class="fas fa-redo"></i>
+<!--              <i class="fas fa-redo"></i>-->
               <i class="fas fa-ellipsis-v"></i>
             </div>
           </div>
@@ -53,7 +53,7 @@
           <div class="stats-card-header">
             <h3>错误率排行</h3>
             <div class="card-actions">
-              <i class="fas fa-redo"></i>
+<!--              <i class="fas fa-redo"></i>-->
               <i class="fas fa-ellipsis-v"></i>
             </div>
           </div>
@@ -64,7 +64,7 @@
           <div class="stats-card-header">
             <h3>题型分布</h3>
             <div class="card-actions">
-              <i class="fas fa-redo"></i>
+<!--              <i class="fas fa-redo"></i>-->
               <i class="fas fa-ellipsis-v"></i>
             </div>
           </div>
@@ -75,7 +75,7 @@
           <div class="stats-card-header">
             <h3>学生进度分布</h3>
             <div class="card-actions">
-              <i class="fas fa-redo"></i>
+<!--              <i class="fas fa-redo"></i>-->
               <i class="fas fa-ellipsis-v"></i>
             </div>
           </div>
@@ -140,7 +140,8 @@ const statsFilter = ref({
   tag: 'all'
 });
 
-const availableTags = ref(['微积分', '函数', '高一', '几何', '代数', '概率', '统计', '物理应用']);
+const availableTags = ref(['数据结构', '算法分析', '操作系统', '计算机网络', '数据库原理', '编程基础', '人工智能', '机器学习', '计算机组成原理', '操作系统实验', 'Java编程', 'C语言', 'Python', '前端开发', '后端开发', 'Web开发', '计算复杂性', '密码学', '分布式系统', '大数据处理']
+);
 
 const answerFrequencyChart = ref(null);
 const errorRateChart = ref(null);
@@ -174,7 +175,6 @@ const initCharts = () => {
   // 初始化答题频次图表
   const frequencyChart = echarts.init(answerFrequencyChart.value);
   frequencyChart.setOption({
-    title: { text: '题目答题频次TOP10' },
     tooltip: {},
     xAxis: { type: 'value' },
     yAxis: { type: 'category', data: frequencyChartData.value.frequencyChartDataIdList },
@@ -191,7 +191,6 @@ const initCharts = () => {
   // 初始化错误率图表
   const errorChart = echarts.init(errorRateChart.value);
   errorChart.setOption({
-    title: { text: '错误率最高的题目' },
     tooltip: {},
     yAxis: { type: 'value', max: 1, name: '正确率' },
     xAxis: { type: 'category', data: errorChartData.value.errorChartDataIdList },
@@ -207,7 +206,6 @@ const initCharts = () => {
   // 初始化题型分布图表
   const typeChart = echarts.init(questionTypeChart.value);
   typeChart.setOption({
-    title: { text: '题型分布' },
     tooltip: {
       trigger: 'item',
       formatter: '{b}: {c} ({d}%)'
@@ -227,7 +225,6 @@ const initCharts = () => {
   // 初始化学生进度图表
   const progressChart = echarts.init(studentProgressChart.value);
   progressChart.setOption({
-    title: { text: '学生完成进度分布' },
     tooltip: {},
     xAxis: {
       type: 'category',
