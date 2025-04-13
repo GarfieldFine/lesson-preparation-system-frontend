@@ -107,11 +107,11 @@
               ></el-date-picker>
             </el-form-item>
 
-            <el-form-item label="考试开始时间" prop="endTime">
+            <el-form-item label="考试结束时间" prop="endTime">
               <el-date-picker
                 v-model="examConfig.endTime"
                 type="datetime"
-                placeholder="选择考试开始时间"
+                placeholder="选择考试结束时间"
                 format="YYYY-MM-DD HH:mm"
                 value-format="YYYY-MM-DD HH:mm:ss"
                 :disabled-date="disabledDate"
@@ -316,10 +316,10 @@
             保存考试
             <el-icon class="el-icon--right"><Check /></el-icon>
           </el-button>
-          <el-button type="success" @click="exportExam">
-            导出考试
-            <el-icon class="el-icon--right"><Download /></el-icon>
-          </el-button>
+<!--          <el-button type="success" @click="exportExam">-->
+<!--            导出考试-->
+<!--            <el-icon class="el-icon&#45;&#45;right"><Download /></el-icon>-->
+<!--          </el-button>-->
         </span>
       </template>
     </el-dialog>
