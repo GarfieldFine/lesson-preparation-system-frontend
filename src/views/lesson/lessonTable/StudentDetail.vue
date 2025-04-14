@@ -25,7 +25,7 @@
             <div class="student-id">学号：{{ studentInfo.studentId }}</div>
             <div class="student-tags">
               <el-tag v-if="studentInfo.isExcellent" type="danger" effect="plain">优秀学生</el-tag>
-              <el-tag v-if= "studentInfo.position" type="warning" effect="plain">{{ studentInfo.position }}</el-tag>
+              <el-tag v-if="studentInfo.position" type="warning" effect="plain">{{ studentInfo.position }}</el-tag>
             </div>
           </div>
         </div>
@@ -225,11 +225,131 @@
         </el-timeline-item>
       </el-timeline>
     </el-card>
+
+    <!-- 学情分析 -->
+    <el-card class="subject-analysis-card">
+      <template #header>
+        <div class="card-header">
+          <span><el-icon><DataAnalysis /></el-icon> 学情分析</span>
+        </div>
+      </template>
+      
+      <!-- 学习进度 -->
+      <div class="analysis-section">
+        <h3><el-icon><TrendCharts /></el-icon> 学习进度</h3>
+        <div class="progress-grid">
+          <div class="progress-item" v-for="(item, index) in learningProgress" :key="index">
+            <div class="progress-label">{{ item.label }}</div>
+            <el-progress 
+              type="circle" 
+              :percentage="item.percentage"
+              :color="item.color"
+              :stroke-width="10"
+            />
+            <div class="progress-desc">{{ item.description }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 知识点掌握情况 -->
+      <div class="analysis-section">
+        <h3><el-icon><Reading /></el-icon> 知识点掌握情况</h3>
+        <div class="knowledge-chart">
+          <div id="knowledgeBarChart" class="chart"></div>
+        </div>
+        <div class="knowledge-tags">
+          <el-tag 
+            v-for="(tag, index) in knowledgeTags" 
+            :key="index"
+            :type="tag.type"
+            effect="light"
+            class="knowledge-tag"
+          >
+            {{ tag.name }}: {{ tag.score }}分
+          </el-tag>
+        </div>
+      </div>
+
+      <!-- 学习建议 -->
+      <div class="analysis-section">
+        <h3><el-icon><ChatDotRound /></el-icon> 学习建议</h3>
+        <div class="suggestion-list">
+          <div class="suggestion-item" v-for="(suggestion, index) in learningAdvice" :key="index">
+            <div class="suggestion-icon">
+              <el-icon :size="24" :color="suggestion.color">
+                <component :is="suggestion.icon"></component>
+              </el-icon>
+            </div>
+            <div class="suggestion-content">
+              <div class="suggestion-title">{{ suggestion.title }}</div>
+              <div class="suggestion-desc">{{ suggestion.description }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </el-card>
+
+    <!-- 推荐资源 -->
+    <el-card class="recommended-resources-card">
+      <template #header>
+        <div class="card-header">
+          <span><el-icon><Collection /></el-icon> 推荐资源</span>
+        </div>
+      </template>
+      <el-tabs v-model="activeResourceTab" class="resource-tabs">
+        <el-tab-pane label="习题集" name="exercises">
+          <div class="resource-list">
+            <div v-for="(item, index) in recommendedExercises" :key="index" class="resource-item">
+              <div class="resource-title">
+                <el-icon><Document /></el-icon>
+                <span>{{ item.title }}</span>
+              </div>
+              <div class="resource-info">
+                <el-tag size="small" :type="item.difficultyType">{{ item.difficulty }}</el-tag>
+                <span class="resource-count">{{ item.questionCount }}题</span>
+              </div>
+              <div class="resource-reason">推荐理由：{{ item.reason }}</div>
+            </div>
+          </div>
+        </el-tab-pane>
+        <el-tab-pane label="OJ题目" name="oj">
+          <div class="resource-list">
+            <div v-for="(item, index) in recommendedOJ" :key="index" class="resource-item">
+              <div class="resource-title">
+                <el-icon><Monitor /></el-icon>
+                <span>{{ item.title }}</span>
+              </div>
+              <div class="resource-info">
+                <el-tag size="small" :type="item.difficultyType">{{ item.difficulty }}</el-tag>
+                <span class="resource-type">{{ item.type }}</span>
+              </div>
+              <div class="resource-reason">推荐理由：{{ item.reason }}</div>
+            </div>
+          </div>
+        </el-tab-pane>
+        <el-tab-pane label="学习视频" name="videos">
+          <div class="resource-list">
+            <div v-for="(item, index) in recommendedVideos" :key="index" class="resource-item">
+              <div class="resource-title">
+                <el-icon><VideoCamera /></el-icon>
+                <span>{{ item.title }}</span>
+              </div>
+              <div class="resource-info">
+                <span class="video-duration"><el-icon><Timer /></el-icon> {{ item.duration }}</span>
+                <span class="video-teacher">{{ item.teacher }}</span>
+              </div>
+              <div class="resource-reason">推荐理由：{{ item.reason }}</div>
+            </div>
+          </div>
+        </el-tab-pane>
+      </el-tabs>
+    </el-card>
+
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import * as echarts from 'echarts'
 import {
@@ -241,7 +361,15 @@ import {
   Histogram,
   TopRight,
   ChatDotRound,
-  Position
+  Position,
+  Collection,
+  Document,
+  Monitor,
+  VideoCamera,
+  Timer,
+  Aim,
+  Lightning,
+  Star
 } from '@element-plus/icons-vue'
 import { getStudentDetailService } from '@/api/students.js'
 
@@ -330,6 +458,60 @@ const format = (percentage) => {
   return `${percentage}%`
 }
 
+// 学习进度数据
+const learningProgress = ref([
+  {
+    label: '课程进度',
+    percentage: 85,
+    color: '#67C23A',
+    description: '已完成85%的课程内容'
+  },
+  {
+    label: '作业完成率',
+    percentage: 92,
+    color: '#409EFF',
+    description: '按时提交率92%'
+  },
+  {
+    label: '实验完成度',
+    percentage: 78,
+    color: '#E6A23C',
+    description: '完成率78%'
+  }
+])
+
+// 知识点掌握情况
+const knowledgeTags = ref([
+  { name: '数据结构', score: 92, type: 'success' },
+  { name: '算法分析', score: 85, type: 'primary' },
+  { name: '编程基础', score: 95, type: 'success' },
+  { name: '数据库', score: 88, type: 'primary' },
+  { name: '网络原理', score: 82, type: 'warning' },
+  { name: '操作系统', score: 78, type: 'warning' }
+])
+
+// 学习建议
+const learningAdvice = ref([
+  {
+    title: '重点关注',
+    description: '建议加强网络原理和操作系统相关知识的学习',
+    icon: 'Aim',
+    color: '#F56C6C'
+  },
+  {
+    title: '优势巩固',
+    description: '在数据结构和编程基础方面表现优秀，建议参加相关竞赛',
+    icon: 'Star',
+    color: '#67C23A'
+  },
+  {
+    title: '学习方法',
+    description: '建议多做实验，提高动手能力，加深对理论知识的理解',
+    icon: 'Lightning',
+    color: '#E6A23C'
+  }
+])
+
 // AI学习总结
 const aiSummary = ref({
   generalComment: '张小明同学在本学期表现出色，尤其在高等数学和程序设计课程上有明显的优势。学习态度积极，课堂参与度高，能够主动思考问题并积极参与小组讨论。',
@@ -362,6 +544,83 @@ const formatDate = (date) => {
   const day = String(date.getDate()).padStart(2, '0')
   return `${year}-${month}-${day}`
 }
+
+// 推荐资源相关数据
+const activeResourceTab = ref('exercises')
+
+// 推荐习题集
+// 推荐习题集
+const recommendedExercises = ref([
+  {
+    title: '二叉树遍历与应用专题',
+    difficulty: '中等',
+    difficultyType: 'warning',
+    questionCount: 45,
+    reason: '帮助你掌握二叉树的各种遍历方法和实际应用场景'
+  },
+  {
+    title: '图论算法基础练习',
+    difficulty: '简单',
+    difficultyType: 'success',
+    questionCount: 30,
+    reason: '通过基础图论问题帮助你理解图的表示和基本操作'
+  },
+  {
+    title: '动态规划经典问题集',
+    difficulty: '困难',
+    difficultyType: 'danger',
+    questionCount: 35,
+    reason: '包含经典动态规划题目，提升你的算法设计能力'
+  }
+])
+
+// 推荐OJ题目
+const recommendedOJ = ref([
+  {
+    title: '矩阵快速幂算法实现',
+    difficulty: '中等',
+    difficultyType: 'warning',
+    type: '算法实现',
+    reason: '适合提升你的代码实现能力'
+  },
+  {
+    title: '最短路径问题求解',
+    difficulty: '困难',
+    difficultyType: 'danger',
+    type: '图论算法',
+    reason: '帮助你深入理解图论算法的应用'
+  },
+  {
+    title: '简单数据结构实现',
+    difficulty: '简单',
+    difficultyType: 'success',
+    type: '基础训练',
+    reason: '巩固基本的数据结构知识'
+  }
+])
+
+// 推荐学习视频
+const recommendedVideos = ref([
+  {
+    title: '二叉树数据结构详解',
+    duration: '45分钟',
+    teacher: '王教授',
+    reason: '系统讲解二叉树的基本概念、遍历方法和实际应用场景'
+  },
+  {
+    title: '常见排序算法分析与实现',
+    duration: '60分钟',
+    teacher: '李教授',
+    reason: '深入剖析各种排序算法的原理、实现和性能比较'
+  },
+  {
+    title: '动态规划解题技巧',
+    duration: '50分钟',
+    teacher: '张教授',
+    reason: '通过经典例题讲解动态规划的思路和解题方法'
+  }
+])
+
 
 const randomCount = () => {
   return Math.floor(Math.random() * (100 - 40 + 1)) + 40;
@@ -517,6 +776,72 @@ onMounted(async () => {
   }
   lineChart.setOption(lineOption)
 
+  // 初始化知识点掌握情况图表
+  const knowledgeChart = echarts.init(document.getElementById('knowledgeBarChart'))
+  const knowledgeOption = {
+    title: {
+      text: '知识点掌握度分析',
+      textStyle: {
+        fontSize: 14
+      }
+    },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        type: 'shadow'
+      }
+    },
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '3%',
+      containLabel: true
+    },
+    xAxis: [
+      {
+        type: 'category',
+        data: knowledgeTags.value.map(tag => tag.name),
+        axisLabel: {
+          interval: 0,
+          rotate: 30
+        }
+      }
+    ],
+    yAxis: [
+      {
+        type: 'value',
+        name: '掌握度',
+        min: 0,
+        max: 100,
+        axisLabel: {
+          formatter: '{value}分'
+        }
+      }
+    ],
+    series: [
+      {
+        name: '得分',
+        type: 'bar',
+        data: knowledgeTags.value.map(tag => tag.score),
+        itemStyle: {
+          color: function(params) {
+            const score = params.data
+            if (score >= 90) return '#67C23A'
+            if (score >= 80) return '#409EFF'
+            if (score >= 70) return '#E6A23C'
+            return '#F56C6C'
+          }
+        },
+        label: {
+          show: true,
+          position: 'top',
+          formatter: '{c}分'
+        }
+      }
+    ]
+  }
+  knowledgeChart.setOption(knowledgeOption)
+
   // 初始化练习题完成情况图表
   const practiceChart = echarts.init(document.getElementById('practiceCompletionChart'))
   const practiceOption = {
@@ -613,6 +938,69 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+/* 推荐资源卡片样式 */
+.recommended-resources-card {
+  margin-top: 20px;
+}
+
+.resource-tabs {
+  width: 100%;
+}
+
+.resource-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 8px 0;
+}
+
+.resource-item {
+  background-color: var(--el-bg-color-page);
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.resource-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.1);
+}
+
+.resource-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.resource-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 8px;
+  color: var(--el-text-color-secondary);
+  font-size: 14px;
+}
+
+.resource-count,
+.resource-type,
+.video-duration,
+.video-teacher {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.resource-reason {
+  color: var(--el-text-color-regular);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+
 .student-detail-container {
   padding: 20px;
   background-color: #f5f7fa;
@@ -727,15 +1115,118 @@ onMounted(async () => {
 
 .chart-container {
   display: flex;
-  flex-wrap: wrap;
   gap: 20px;
-  margin-top: 20px;
+  margin: 20px 0;
+  .chart {
+    flex: 1;
+    height: 400px;
+  }
 }
 
-.chart {
-  height: 350px;
-  flex: 1;
-  min-width: 300px;
+.knowledge-chart {
+  margin: 20px 0;
+  .chart {
+    width: 100%;
+    height: 400px;
+  }
+}
+
+/* 学情分析样式 */
+.analysis-section {
+  margin-bottom: 30px;
+
+  h3 {
+    font-size: 16px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+.progress-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.progress-item {
+  text-align: center;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+  .progress-label {
+    font-size: 14px;
+    color: #606266;
+    margin-bottom: 15px;
+  }
+
+  .progress-desc {
+    font-size: 12px;
+    color: #909399;
+    margin-top: 10px;
+  }
+}
+
+.knowledge-chart {
+  margin-bottom: 20px;
+}
+
+.knowledge-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+
+  .knowledge-tag {
+    font-size: 14px;
+  }
+}
+
+.suggestion-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.suggestion-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+  .suggestion-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background-color: rgba(64, 158, 255, 0.1);
+    border-radius: 50%;
+  }
+
+  .suggestion-content {
+    flex: 1;
+
+    .suggestion-title {
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #303133;
+    }
+
+    .suggestion-desc {
+      font-size: 14px;
+      color: #606266;
+      line-height: 1.5;
+    }
+  }
 }
 
 .subject-detail-container {

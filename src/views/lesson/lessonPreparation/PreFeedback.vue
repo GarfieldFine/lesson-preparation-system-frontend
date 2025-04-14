@@ -130,6 +130,107 @@
       </div>
     </el-card>
   </div>
+
+    <!-- 学情分析卡片 -->
+    <el-card class="learning-analysis-card">
+      <template #header>
+        <div class="card-header">
+          <span>班级学情分析</span>
+          <el-tag type="success" size="small">AI分析</el-tag>
+        </div>
+      </template>
+      <div class="analysis-content">
+        <el-row :gutter="20">
+          <el-col :span="8">
+            <div class="analysis-item">
+              <h4>知识点掌握度分布</h4>
+              <div class="stat-numbers">
+                <div class="stat-item">
+                  <span class="number success">{{ Math.floor(Math.random() * 21 + 40) }}%</span>
+                  <span class="label">单链表</span>
+                </div>
+                <div class="stat-item">
+                  <span class="number success">{{ Math.floor(Math.random() * 21 + 40) }}%</span>
+                  <span class="label">双向链表</span>
+                </div>
+                <div class="stat-item">
+                  <span class="number success">{{ Math.floor(Math.random() * 21 + 40) }}%</span>
+                  <span class="label">循环链表</span>
+                </div>
+                <div class="stat-item">
+                  <span class="number success">{{ Math.floor(Math.random() * 21 + 40) }}%</span>
+                  <span class="label">循环链表</span>
+                </div>
+                <div class="stat-item">
+                  <span class="number success">{{ Math.floor(Math.random() * 21 + 40) }}%</span>
+                  <span class="label">跳表</span>
+                </div>
+              </div>
+            </div>
+          </el-col>
+          <el-col :span="8">
+            <div class="analysis-item">
+              <h4>学习进度统计</h4>
+              <div class="progress-stats">
+                <el-progress type="dashboard" :percentage="Math.floor(Math.random() * 15 + 70)" :color="'#67C23A'">
+                  <template #default="{ percentage }">
+                    <span class="progress-label">完成率</span>
+                    <span class="progress-percentage">{{ percentage }}%</span>
+                  </template>
+                </el-progress>
+                <div class="progress-detail">
+                  <p>班级平均进度超过预期</p>
+                  <p>建议适当增加教学难度</p>
+                </div>
+              </div>
+            </div>
+          </el-col>
+          <el-col :span="8">
+            <div class="analysis-item">
+              <h4>重点难点分析</h4>
+              <div class="key-points">
+                <el-tag v-for="(point, index) in keyPoints" :key="index" :type="point.type" class="point-tag">
+                  {{ point.content }}
+                </el-tag>
+              </div>
+            </div>
+          </el-col>
+        </el-row>
+      </div>
+    </el-card>
+
+    <!-- 教学资源推荐卡片 -->
+    <el-card class="resource-recommendation-card">
+      <template #header>
+        <div class="card-header">
+          <span>教学资源推荐</span>
+          <el-tag type="info" size="small">智能推荐</el-tag>
+        </div>
+      </template>
+      <div class="resource-content">
+        <el-row :gutter="20">
+          <el-col :span="8" v-for="(resource, index) in recommendedResources" :key="index">
+            <el-card class="resource-item" shadow="hover">
+              <template #header>
+                <div class="resource-header">
+                  <el-icon :class="resource.icon"></el-icon>
+                  <span>{{ resource.title }}</span>
+                </div>
+              </template>
+              <div class="resource-detail">
+                <p class="description" style="height: 55px">{{ resource.description }}</p>
+                <div class="resource-meta">
+                  <span class="type">{{ resource.type }}</span>
+                  <span class="duration">{{ resource.duration }}</span>
+                </div>
+                <el-button type="primary" @click="navigateToResource(resource.link)">查看详情</el-button>
+              </div>
+            </el-card>
+          </el-col>
+        </el-row>
+      </div>
+    </el-card>
+
 </template>
 
 <script setup>
@@ -155,7 +256,8 @@ const tableLoading = ref(false)
 // 筛选和搜索
 const submitFilter = ref('all')
 const searchKeyword = ref('')
-
+let a = 0;
+let b = 0;
 // 筛选后的学生列表
 const filteredStudentList = computed(() => {
   let result = [...studentPracticeList.value]
@@ -190,7 +292,55 @@ const initBarChart = (op) => {
   barChart.setOption(JSON.parse(op))
 }
 
+const navigateToResource = (link) => {
+  if (link) {
+    window.location.replace(link);
+  } else {
+    console.error("链接无效");
+  }
+}
+
 // 获取正确率状态
+// 重点难点数据
+const keyPoints = ref([
+  { content: '指针操作与内存管理', type: 'danger' },
+  { content: '插入与删除的边界条件', type: 'warning' },
+  { content: '遍历与查找的效率', type: 'warning' },
+  { content: '特殊链表结构', type: 'danger' },
+  { content: '动态扩容与缩容', type: 'info' },
+  { content: '插入与删除的元素移动', type: 'warning' },
+  { content: '随机访问与索引越界', type: 'danger' },
+  { content: '线性表操作中的常见错误', type: 'info' }
+])
+
+// 推荐资源数据
+const recommendedResources = ref([
+  {
+    title: '线性表与链表专题讲解',
+    description: '线性表与链表基础算法的视频教程',
+    type: '视频课程',
+    duration: '60分钟',
+    icon: 'VideoCamera',
+    link: 'https://www.bilibili.com/video/BV1M7411f7aU/?spm_id_from=333.337.search-card.all.click'
+  },
+  {
+    title: '数据结构经典习题集',
+    description: '精选数据结构核心算法题目，包含详细解析和复杂度分析',
+    type: '习题资源',
+    duration: '40题',
+    icon: 'Document',
+    link: 'http://localhost:5173/lesson/practice/question-bank/22'
+  },
+  {
+    title: '数据结构可视化实验平台',
+    description: '交互式数据结构学习平台，提供算法动画演示和在线编程环境',
+    type: '在线课程',
+    duration: '3小时',
+    icon: 'Monitor',
+    link: 'https://www.cs.usfca.edu/~galles/visualization/Algorithms.html'
+  }
+])
+
 const getCorrectRateStatus = (correctCount, completedCount) => {
   if (completedCount === 0) return ''
   const rate = (correctCount / completedCount) * 100
@@ -248,6 +398,138 @@ onMounted(async () => {
 <style scoped>
 .pre-feedback-container {
   padding: 20px;
+}
+
+.learning-analysis-card,
+.resource-recommendation-card {
+  margin-top: 20px;
+}
+
+.analysis-content,
+.resource-content {
+  padding: 10px;
+}
+
+.analysis-item {
+  text-align: center;
+  padding: 20px;
+  height: 100%;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+.analysis-item h4 {
+  margin-bottom: 20px;
+  color: #303133;
+}
+
+.stat-numbers {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px;
+  background-color: white;
+  border-radius: 6px;
+}
+
+.number {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.number.success { color: #67C23A; }
+.number.warning { color: #E6A23C; }
+.number.danger { color: #F56C6C; }
+
+.label {
+  color: #606266;
+  font-size: 14px;
+}
+
+.progress-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.progress-label {
+  font-size: 14px;
+  color: #909399;
+}
+
+.progress-percentage {
+  display: block;
+  font-size: 24px;
+  font-weight: bold;
+  color: #67C23A;
+}
+
+.progress-detail {
+  text-align: center;
+  color: #606266;
+}
+
+.progress-detail p {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+.key-points {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.point-tag {
+  margin: 5px;
+}
+
+.resource-item {
+  height: 100%;
+  transition: transform 0.3s;
+}
+
+.resource-item:hover {
+  transform: translateY(-5px);
+}
+
+.resource-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.resource-header .el-icon {
+  font-size: 20px;
+  color: var(--el-color-primary);
+}
+
+.resource-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.description {
+  color: #606266;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 10px 0;
+}
+
+.resource-meta {
+  display: flex;
+  justify-content: space-between;
+  color: #909399;
+  font-size: 12px;
 }
 
 .nav-buttons {

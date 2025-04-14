@@ -13,7 +13,7 @@
 
       <!-- 移动保存按钮到这里，改为固定定位 -->
       <div class="save-button-container">
-        <button class="media-button" @click="generateMedia" :disabled="isGeneratingMedia">
+        <button class="media-button" @click="showPPTTemplateDialog" :disabled="isGeneratingMedia">
           <i class="el-icon-picture"></i>
           {{ isGeneratingMedia ? '生成中...' : '多媒体资源生成' }}
         </button>
@@ -76,6 +76,36 @@
       </div>
     </div>
   </div>
+
+  <!-- PPT模板展示弹窗 -->
+  <el-dialog
+    v-model="isPPTTemplateDialogVisible"
+    title="PPT模板展示"
+    width="70%"
+    align-center
+  >
+    <div class="ppt-template-content">
+      <div class="template-grid">
+        <div
+          v-for="(template, index) in pptTemplates"
+          :key="index"
+          :class="['template-item', { active: selectedTemplate === index }]"
+          @click="selectTemplate(index)"
+        >
+          <img :src="template.preview" :alt="template.name" class="template-preview" />
+          <div class="template-name">{{ template.name }}</div>
+        </div>
+      </div>
+    </div>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="isPPTTemplateDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="confirmTemplate" :disabled="selectedTemplate === null">
+          确认
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup>
@@ -88,8 +118,10 @@ import {
   lessonHourPreparationSaveTeachingContentService, createPPT, saveMultimedia, getMultimedia
 }
   from '@/api/lessonHourPreparationLesson.js'
-import { useRoute,useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { useRoute, useRouter } from 'vue-router'
+import { ElMessage, ElDialog } from 'element-plus'
+import 'element-plus/dist/index.css'
+
 const teacherScheduleId = useRoute().params.teacherScheduleId
 const id = 'preview-only'
 const previewRef = ref(null)
@@ -104,6 +136,40 @@ const multimedia = ref({
   videoUrl:[],
   imagesUrl:[]
 })
+
+// 添加对话框的显示状态和模板相关状态
+const isPPTTemplateDialogVisible = ref(false)
+const selectedTemplate = ref(null)
+const pptTemplates = ref([
+  {  preview: '/templates/business.svg' },
+  {  preview: '/templates/education.svg' },
+  {  preview: '/templates/creative.svg' },
+  {  preview: '/templates/tech.svg' }
+])
+
+// 显示PPT模板对话框的方法
+const showPPTTemplateDialog = () => {
+  selectedTemplate.value = null
+  isPPTTemplateDialogVisible.value = true
+}
+
+// 选择模板
+const selectTemplate = (index) => {
+  selectedTemplate.value = index
+}
+
+// 确认模板选择
+const confirmTemplate = async () => {
+  if (selectedTemplate.value !== null) {
+    isPPTTemplateDialogVisible.value = false
+    isGeneratingMedia.value = true
+    try {
+      await generateMedia()
+    } finally {
+      isGeneratingMedia.value = false
+    }
+  }
+}
 
 const Notification1 = () => {
   ElNotification({
@@ -507,6 +573,57 @@ const  handleMultimediaIsExist=async ()=>{
   padding: 20px;
   gap: 24px;
   background-color: #f8f9fa;
+}
+
+.ppt-template-content {
+  padding: 20px;
+}
+
+.template-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  padding: 10px;
+}
+
+.template-item {
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.template-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.template-item.active {
+  border-color: #3182ce;
+  background-color: #ebf8ff;
+}
+
+.template-preview {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.template-name {
+  font-size: 0.9rem;
+  color: #4a5568;
+  text-align: center;
+}
+
+.dialog-footer {
+  padding-top: 20px;
+  text-align: right;
 }
 
 .content-left {

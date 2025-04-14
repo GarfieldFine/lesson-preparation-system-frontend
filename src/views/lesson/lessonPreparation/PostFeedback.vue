@@ -101,7 +101,7 @@ import * as echarts from 'echarts'
 
 import { useRoute, useRouter } from 'vue-router'
 import { analysisStudentPostLessonFeedback, getWordCloudInfo } from '@/api/feedback.js'
-import WordCloud from '@/views/component/WordCloud.vue'
+
 
 const router = useRouter()
 const satisfactionChartRef = ref(null)
@@ -278,7 +278,7 @@ const predefinedKeywords = ref([
 const initWordCloudChart = () => {
   // 使用预设的关键词数据，确保词云图能够正确显示
 
-  if(wordCloudChartRef){
+  if(wordCloudChartRef.value){
     const chart = echarts.init(wordCloudChartRef.value);
     const option = {
       series: [{

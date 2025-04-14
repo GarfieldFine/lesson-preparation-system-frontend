@@ -1,10 +1,10 @@
 <template>
   <div class="mindmap-container">
     <multimedia-nav />
-    <div class="content-area">
-      <h2 class="page-title">教学思维导图</h2>
-      
-      <div class="filter-bar">
+    <div class="main-layout">
+      <!-- 左侧思维导图库导航 -->
+      <div class="left-panel">
+        <h2 class="panel-title">思维导图库</h2>
         <el-input
           v-model="searchQuery"
           placeholder="搜索思维导图"
@@ -12,68 +12,116 @@
           clearable
           class="search-input"
         />
-        <el-select v-model="categoryFilter" placeholder="分类" clearable class="category-select">
-          <el-option label="全部" value="" />
-          <el-option label="课程规划" value="planning" />
-          <el-option label="知识点" value="knowledge" />
-          <el-option label="教学流程" value="process" />
-        </el-select>
-      </div>
-      
-      <div class="mindmap-grid">
-        <div 
-          v-for="(mindmap, index) in filteredMindmaps" 
-          :key="index"
-          class="mindmap-card"
-          @click="viewMindmap(mindmap)"
-        >
-          <div class="mindmap-preview">
-            <img :src="mindmap.thumbnail" :alt="mindmap.title" class="thumbnail" />
-          </div>
-          <div class="mindmap-info">
-            <h3 class="mindmap-title">{{ mindmap.title }}</h3>
-            <div class="mindmap-meta">
-              <span class="category-tag">{{ mindmap.category }}</span>
-              <span class="date">{{ mindmap.date }}</span>
+        <el-tree
+          :data="mindmapCategories"
+          :props="defaultProps"
+          @node-click="handleNodeClick"
+          class="category-tree"
+        />
+        <div class="mindmap-list">
+          <div
+            v-for="(mindmap, index) in filteredMindmaps"
+            :key="index"
+            class="mindmap-item"
+            @click="selectMindmap(mindmap)"
+          >
+            <div class="mindmap-preview">
+              <img :src="mindmap.thumbnail" :alt="mindmap.title" class="thumbnail" />
+            </div>
+            <div class="mindmap-info">
+              <h3 class="mindmap-title">{{ mindmap.title }}</h3>
+              <div class="mindmap-meta">
+                <span class="category-tag">{{ mindmap.category }}</span>
+              </div>
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- 中间AI对话区域 -->
+      <div class="chat-section">
+        <div class="chat-container">
+          <div class="chat-messages" ref="messagesContainer">
+            <div class="message-date">今天</div>
+            <div v-for="(message, idx) in chatMessages" :key="idx"
+                 :class="['message', message.type]">
+              <div class="message-avatar">
+                <i v-if="message.type === 'ai'" class="fas fa-robot"></i>
+                <img v-else src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150" alt="用户头像">
+              </div>
+              <div class="message-content">
+                <div class="message-text" v-html="message.content"></div>
+                <div v-if="message.type === 'ai'" class="message-actions">
+                  <button class="action-btn">
+                    <i class="fas fa-copy"></i> 复制
+                  </button>
+                  <button class="action-btn">
+                    <i class="fas fa-thumbs-up"></i> 有帮助
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div v-if="isTyping" class="message ai">
+              <div class="message-avatar">
+                <i class="fas fa-robot"></i>
+              </div>
+              <div class="message-content">
+                <div class="typing-indicator">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="chat-input">
+            <div class="input-container">
+              <textarea
+                v-model="aiPrompt"
+                placeholder="输入您的问题..."
+                @keyup.enter.exact="sendAIPrompt"
+                @keyup.enter.shift.exact="aiPrompt += '\n'"
+                rows="1"
+                ref="promptInput"
+              ></textarea>
+              <div class="input-actions">
+                <button class="action-btn" title="上传文件">
+                  <i class="fas fa-paperclip"></i>
+                </button>
+                <button class="action-btn" title="插入思维导图">
+                  <i class="fas fa-project-diagram"></i>
+                </button>
+              </div>
+            </div>
+            <button class="send-btn">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右侧预览区域 -->
+      <div class="right-panel">
+        <h2 class="panel-title">预览区域</h2>
+        <div class="preview-container" v-if="currentMindmap.url">
+          <div class="mindmap-canvas">
+            <img :src="currentMindmap.fullImage" :alt="currentMindmap.title" class="full-mindmap" />
+          </div>
+          <div class="preview-info">
+            <h4>{{ currentMindmap.title }}</h4>
+            <p>{{ currentMindmap.description }}</p>
+            <div class="preview-meta">
+              <span>分类: {{ currentMindmap.category }}</span>
+              <span>创建者: {{ currentMindmap.creator }}</span>
+              <span>日期: {{ currentMindmap.date }}</span>
+            </div>
+          </div>
+        </div>
+        <el-empty v-else description="暂无预览内容" />
       </div>
     </div>
-    
-    <!-- 思维导图查看对话框 -->
-    <el-dialog
-      v-model="viewerVisible"
-      :title="currentMindmap.title"
-      width="80%"
-      fullscreen
-      destroy-on-close
-    >
-      <div class="mindmap-viewer">
-        <div class="mindmap-canvas">
-          <!-- 这里是简化的思维导图展示，实际项目中可以集成专业的思维导图库 -->
-          <img :src="currentMindmap.fullImage" :alt="currentMindmap.title" class="full-mindmap" />
-        </div>
-        <div class="mindmap-details">
-          <h3>{{ currentMindmap.title }}</h3>
-          <p class="description">{{ currentMindmap.description }}</p>
-          <div class="meta-info">
-            <div class="meta-item">
-              <span class="label">创建者:</span>
-              <span>{{ currentMindmap.creator }}</span>
-            </div>
-            <div class="meta-item">
-              <span class="label">创建日期:</span>
-              <span>{{ currentMindmap.date }}</span>
-            </div>
-            <div class="meta-item">
-              <span class="label">分类:</span>
-              <span>{{ currentMindmap.category }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
@@ -91,7 +139,7 @@ export default {
     const categoryFilter = ref('')
     const viewerVisible = ref(false)
     const currentMindmap = ref({})
-    
+
     // 模拟思维导图数据
     const mindmaps = ref([
       {
@@ -155,7 +203,7 @@ export default {
         date: '2023-09-30'
       }
     ])
-    
+
     // 过滤思维导图
     const filteredMindmaps = computed(() => {
       return mindmaps.value.filter(mindmap => {
@@ -165,13 +213,13 @@ export default {
         return matchesSearch && matchesCategory
       })
     })
-    
+
     // 查看思维导图
     const viewMindmap = (mindmap) => {
       currentMindmap.value = mindmap
       viewerVisible.value = true
     }
-    
+
     return {
       searchQuery,
       categoryFilter,
@@ -192,143 +240,345 @@ export default {
   height: 100vh;
 }
 
-.content-area {
-  flex: 1;
-  padding: 20px;
-  overflow-y: auto;
-}
-
-.page-title {
-  font-size: 24px;
-  color: #409eff;
-  margin-bottom: 20px;
-  font-weight: 500;
-}
-
-.filter-bar {
+.main-layout {
   display: flex;
-  gap: 16px;
-  margin-bottom: 24px;
+  flex: 1;
+  gap: 24px;
+  padding: 20px;
+  overflow: hidden;
+}
+
+.left-panel {
+  width: 300px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.panel-title {
+  font-size: 18px;
+  font-weight: 500;
+  color: #1e293b;
+  padding: 16px;
+  margin: 0;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .search-input {
-  width: 300px;
+  margin: 16px;
 }
 
-.category-select {
-  width: 150px;
+.category-tree {
+  padding: 16px;
+  border-bottom: 1px solid #e2e8f0;
 }
 
-.mindmap-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 24px;
+.mindmap-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
 }
 
-.mindmap-card {
+.mindmap-item {
+  margin-bottom: 16px;
+  cursor: pointer;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  cursor: pointer;
-  background-color: #fff;
-  
+  transition: all 0.2s;
+  border: 1px solid #e2e8f0;
+
   &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
 }
 
 .mindmap-preview {
-  height: 200px;
-  overflow: hidden;
-}
-
-.thumbnail {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.5s ease;
-  
-  &:hover {
-    transform: scale(1.05);
+  height: 160px;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 }
 
 .mindmap-info {
-  padding: 16px;
+  padding: 12px;
+  background: white;
 }
 
 .mindmap-title {
-  font-size: 18px;
-  margin: 0 0 10px 0;
-  color: #333;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 14px;
+  margin: 0 0 8px;
+  color: #1e293b;
 }
 
 .mindmap-meta {
   display: flex;
-  justify-content: space-between;
-  font-size: 14px;
-  color: #606266;
-}
-
-.category-tag {
-  background-color: #f0f9ff;
-  color: #409eff;
-  padding: 2px 6px;
-  border-radius: 4px;
-}
-
-.mindmap-viewer {
-  display: flex;
-  flex-direction: column;
-  height: 80vh;
-}
-
-.mindmap-canvas {
-  flex: 1;
-  display: flex;
-  justify-content: center;
   align-items: center;
-  background-color: #f5f7fa;
-  padding: 20px;
-  overflow: auto;
-}
-
-.full-mindmap {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-}
-
-.mindmap-details {
-  padding: 20px;
-  background-color: #fff;
-  border-top: 1px solid #e4e7ed;
-}
-
-.description {
-  margin-bottom: 16px;
-  color: #606266;
-  line-height: 1.6;
-}
-
-.meta-info {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-
-.meta-item {
-  display: flex;
   gap: 8px;
 }
 
-.label {
-  font-weight: 500;
-  color: #333;
+.category-tag {
+  font-size: 12px;
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.chat-section {
+  flex: 1;
+  min-width: 400px;
+  max-width: 600px;
+}
+
+.chat-container {
+  height: calc(100vh - 100px);
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+.message-date {
+  text-align: center;
+  margin: 16px 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.message {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  align-items: flex-start;
+}
+
+.message.ai {
+  flex-direction: row;
+}
+
+.message.user {
+  flex-direction: row-reverse;
+}
+
+.message-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  background: #f0f9ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0284c7;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.message-content {
+  max-width: 70%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  position: relative;
+}
+
+.message.ai .message-content {
+  background: #f8fafc;
+  color: #1e293b;
+}
+
+.message.user .message-content {
+  background: #0284c7;
+  color: white;
+}
+
+.message-text {
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.message-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.message:hover .message-actions {
+  opacity: 1;
+}
+
+.action-btn {
+  padding: 4px 8px;
+  border: none;
+  background: none;
+  color: #64748b;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s;
+  border-radius: 4px;
+
+  &:hover {
+    background: #e2e8f0;
+    color: #0284c7;
+  }
+}
+
+.typing-indicator {
+  display: flex;
+  gap: 4px;
+  padding: 8px 0;
+}
+
+.typing-indicator span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #cbd5e1;
+  animation: typing 1s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typing {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.chat-input {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.input-container {
+  flex: 1;
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: flex-end;
+}
+
+textarea {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  resize: none;
+  max-height: 120px;
+  font-size: 14px;
+  line-height: 1.5;
+  padding: 4px 0;
+}
+
+.input-actions {
+  display: flex;
+  gap: 8px;
+  padding-left: 8px;
+  border-left: 1px solid #e2e8f0;
+}
+
+.send-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: #0284c7;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover:not(:disabled) {
+    background: #0369a1;
+  }
+
+  &:disabled {
+    background: #e2e8f0;
+    cursor: not-allowed;
+  }
+}
+
+.right-panel {
+  width: 400px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.preview-container {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.mindmap-canvas {
+  width: 100%;
+  margin-bottom: 16px;
+  
+  img {
+    width: 100%;
+    border-radius: 8px;
+  }
+}
+
+.preview-info {
+  h4 {
+    font-size: 16px;
+    margin: 0 0 8px;
+    color: #1e293b;
+  }
+
+  p {
+    font-size: 14px;
+    color: #64748b;
+    margin: 0 0 16px;
+    line-height: 1.5;
+  }
+}
+
+.preview-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: #64748b;
 }
 </style>
