@@ -5,13 +5,13 @@
       <!-- 左侧思维导图库导航 -->
       <div class="left-panel">
         <h2 class="panel-title">思维导图库</h2>
-        <el-input
-          v-model="searchQuery"
-          placeholder="搜索思维导图"
-          prefix-icon="Search"
-          clearable
-          class="search-input"
-        />
+<!--        <el-input-->
+<!--          v-model="searchQuery"-->
+<!--          placeholder="搜索思维导图"-->
+<!--          prefix-icon="Search"-->
+<!--          clearable-->
+<!--          class="search-input"-->
+<!--        />-->
         <el-tree
           :data="mindmapCategories"
           :props="defaultProps"
@@ -184,11 +184,11 @@ export default {
       },
       {
         id: 5,
-        title: '学期教学计划',
+        title: '单链表',
         thumbnail: 'https://picsum.photos/id/105/400/300',
         fullImage: 'https://picsum.photos/id/105/1200/800',
         description: '整个学期的教学计划思维导图，包括各个阶段的教学目标和内容安排。',
-        category: '课程规划',
+        category: '单链表',
         creator: '刘老师',
         date: '2023-08-18'
       },
@@ -552,7 +552,7 @@ textarea {
 .mindmap-canvas {
   width: 100%;
   margin-bottom: 16px;
-  
+
   img {
     width: 100%;
     border-radius: 8px;

@@ -1,17 +1,40 @@
 <template>
   <div class="videos-container">
+
+
+    <!-- 视频播放弹窗 -->
+    <el-dialog
+      v-model="playerVisible"
+      :title="currentVideo.title"
+      width="80%"
+      destroy-on-close
+    >
+<!--      todo src是视频-->
+      <div class="video-player-container">
+        <video-player
+          class="vjs-custom-skin"
+          ref="videoPlayer"
+          :options="playerOptions"
+          :volume="0.6"
+          src="https://iflytek-education.oss-cn-beijing.aliyuncs.com/user/2024/06/10/e0be2dbf4f2a44d38c24b6b4efd054f3.mp4"
+        />
+      </div>
+    </el-dialog>
+
+
+
     <multimedia-nav />
     <div class="main-layout">
       <!-- 左侧视频库导航 -->
       <div class="left-panel">
         <h2 class="panel-title">视频库</h2>
-        <el-input
-          v-model="searchQuery"
-          placeholder="搜索视频"
-          prefix-icon="Search"
-          clearable
-          class="search-input"
-        />
+<!--        <el-input-->
+<!--          v-model="searchQuery"-->
+<!--          placeholder="搜索视频"-->
+<!--          prefix-icon="Search"-->
+<!--          clearable-->
+<!--          class="search-input"-->
+<!--        />-->
         <el-tree
           :data="videoCategories"
           :props="defaultProps"
@@ -100,6 +123,7 @@
                 </button>
               </div>
             </div>
+<!--            点击事件-->
             <button class="send-btn" @click="sendAIPrompt" >
               <i class="fas fa-paper-plane"></i>
             </button>
@@ -142,21 +166,67 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { VideoPlay } from '@element-plus/icons-vue'
 import MultimediaNav from './components/MultimediaNav.vue'
+import { VideoPlayer } from 'vue-video-player'
+import 'video.js/dist/video-js.css'
 
 export default {
   name: 'VideosPage',
   components: {
     MultimediaNav,
-    VideoPlay
+    VideoPlay,
+    VideoPlayer
   },
   setup() {
     const searchQuery = ref('')
     const categoryFilter = ref('')
     const playerVisible = ref(false)
     const currentVideo = ref({})
+    const videoPlayer = ref(null)
+
+    // 播放器配置
+    let playerOptions = ref({
+      // height: 200,
+      // width: document.documentElement.clientWidth, //播放器宽度
+      playbackRates: [0.7, 1.0, 1.5, 2.0], // 播放速度
+      autoplay: 'any', // 如果true,浏览器准备好时开始回放。
+      muted: true, // 默认情况下将会消除任何音频。
+      loop: true, // 导致视频一结束就重新开始。
+      preload: 'auto', // 建议浏览器在<video>加载元素后是否应该开始下载视频数据。auto浏览器选择最佳行为,立即开始加载视频（如果浏览器支持）
+      language: 'zh-CN',
+      aspectRatio: '16:9', // 将播放器置于流畅模式，并在计算播放器的动态大小时使用该值。值应该代表一个比例 - 用冒号分隔的两个数字（例如"16:9"或"4:3"）
+      fluid: true, // 当true时，Video.js player将拥有流体大小。换句话说，它将按比例缩放以适应其容器。
+      notSupportedMessage: '此视频暂无法播放，请稍后再试', // 允许覆盖Video.js无法播放媒体源时显示的默认信息。
+      controls: true,
+      controlBar: {
+        timeDivider: true,
+        durationDisplay: true,
+        remainingTimeDisplay: false,
+        fullscreenToggle: true // 全屏按钮
+      }
+    })
+
+    // 监听当前视频变化
+    watch(() => currentVideo.value, (newVideo) => {
+      if (newVideo && newVideo.url) {
+        playerOptions.value.sources[0].src = newVideo.url
+      }
+    })
+
+    // 播放器准备就绪
+    const onPlayerReady = () => {
+      console.log('播放器准备就绪')
+    }
+
+    // 关闭播放器
+    const handleClosePlayer = () => {
+      if (videoPlayer.value) {
+        videoPlayer.value.pause()
+      }
+      playerVisible.value = false
+    }
     const aiPrompt = ref('')
     const isTyping = ref(false)
     const chatMessages = ref([])
@@ -314,7 +384,8 @@ export default {
       isTyping,
       chatMessages,
       messagesContainer,
-      sendAIPrompt
+      sendAIPrompt,
+      playerOptions
     }
     //
     // // 模拟视频数据
@@ -981,20 +1052,23 @@ textarea {
   padding: 0;
 }
 
-.video-player {
-  display: flex;
-  flex-direction: column;
-}
-
-.player-container {
+.video-player-container {
   width: 100%;
-  background-color: #000;
+  background: #000;
   aspect-ratio: 16/9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.embed-player {
+.vjs-custom-skin {
   width: 100%;
   height: 100%;
+
+  :deep(.video-js) {
+    width: 100%;
+    height: 100%;
+  }
 }
 
 .video-details {

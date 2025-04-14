@@ -115,7 +115,7 @@ import 'md-editor-v3/lib/style.css'
 import {
   lessonHourPreparationGetTeachingContentByIdService,
   lessonHourPreparationAiReviseTeachingContentService,
-  lessonHourPreparationSaveTeachingContentService, createPPT, saveMultimedia, getMultimedia
+  lessonHourPreparationSaveTeachingContentService, createPPT, saveMultimedia, getMultimedia, getPPTTemplate
 }
   from '@/api/lessonHourPreparationLesson.js'
 import { useRoute, useRouter } from 'vue-router'
@@ -148,7 +148,9 @@ const pptTemplates = ref([
 ])
 
 // 显示PPT模板对话框的方法
-const showPPTTemplateDialog = () => {
+const showPPTTemplateDialog = async () => {
+  const res = await getPPTTemplate()
+  console.log(res)
   selectedTemplate.value = null
   isPPTTemplateDialogVisible.value = true
 }
@@ -518,10 +520,10 @@ const isGeneratingMedia = ref(false)
 // 添加多媒体资源生成功能
 const generateMedia = async () => {
   const isExistMultimedia = await handleMultimediaIsExist();
-  if(isExistMultimedia==null || isExistMultimedia.pptUrl=='' || isExistMultimedia.videoUrl=='' || isExistMultimedia.imagesUrl==''){
-    const teachContent=await  handleGetTeachingContent();
+  if (isExistMultimedia == null || isExistMultimedia.pptUrl == '' || isExistMultimedia.videoUrl == '' || isExistMultimedia.imagesUrl == '') {
+    const teachContent = await handleGetTeachingContent();
     //生成ppt
-    multimedia.value.pptUrl= await handleCreateMultimedia(teachContent);
+    multimedia.value.pptUrl = await handleCreateMultimedia(teachContent);
     // console.log(multimedia.value.ppt);
     //生成图片
 
@@ -530,35 +532,35 @@ const generateMedia = async () => {
     //保存到数据库
     await handleSaveMultimedia();
     ElMessage.success("多媒体资源保存成功");
-  }else{
+  } else {
     router.push(`/lesson/lesson_hour/multimedia/ppt/${teacherScheduleId}`);
     // ElMessage.error("多媒体资源已经生成");
   }
 }
 // 生成多媒体资源
-const handleCreateMultimedia=async (teachContent)=>{
-  const pptUrl=await createPPT(teachContent);
+const handleCreateMultimedia = async (teachContent) => {
+  const pptUrl = await createPPT(teachContent);
   return pptUrl.msg;
 }
 
 
 //保存多媒体资源
-const handleSaveMultimedia=async ()=>{
-  await saveMultimedia(teacherScheduleId,multimedia.value);
+const handleSaveMultimedia = async () => {
+  await saveMultimedia(teacherScheduleId, multimedia.value);
   // console.log(res);
   // ElMessage.success("多媒体资源已经生成");
 
 }
 //获取教学内容来生成ppt
-const handleGetTeachingContent=async ()=>{
-  const teachContentRes= await lessonHourPreparationGetTeachingContentByIdService(teacherScheduleId);
+const handleGetTeachingContent = async () => {
+  const teachContentRes = await lessonHourPreparationGetTeachingContentByIdService(teacherScheduleId);
   // console.log(teachContentRes.msg);
   return teachContentRes.msg;
 }
 
 
 //判断多媒体资源是否存在
-const  handleMultimediaIsExist=async ()=>{
+const handleMultimediaIsExist = async () => {
   const res = await getMultimedia(teacherScheduleId)
   console.log(res)
   return res.data;

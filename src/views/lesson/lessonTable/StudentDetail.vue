@@ -233,15 +233,15 @@
           <span><el-icon><DataAnalysis /></el-icon> 学情分析</span>
         </div>
       </template>
-      
+
       <!-- 学习进度 -->
       <div class="analysis-section">
         <h3><el-icon><TrendCharts /></el-icon> 学习进度</h3>
         <div class="progress-grid">
           <div class="progress-item" v-for="(item, index) in learningProgress" :key="index">
             <div class="progress-label">{{ item.label }}</div>
-            <el-progress 
-              type="circle" 
+            <el-progress
+              type="circle"
               :percentage="item.percentage"
               :color="item.color"
               :stroke-width="10"
@@ -258,14 +258,14 @@
           <div id="knowledgeBarChart" class="chart"></div>
         </div>
         <div class="knowledge-tags">
-          <el-tag 
-            v-for="(tag, index) in knowledgeTags" 
+          <el-tag
+            v-for="(tag, index) in knowledgeTags"
             :key="index"
             :type="tag.type"
             effect="light"
             class="knowledge-tag"
           >
-            {{ tag.name }}: {{ tag.score }}分
+            {{ tag.name }}: {{ tag.score }}%
           </el-tag>
         </div>
       </div>
@@ -482,12 +482,12 @@ const learningProgress = ref([
 
 // 知识点掌握情况
 const knowledgeTags = ref([
-  { name: '数据结构', score: 92, type: 'success' },
-  { name: '算法分析', score: 85, type: 'primary' },
-  { name: '编程基础', score: 95, type: 'success' },
-  { name: '数据库', score: 88, type: 'primary' },
-  { name: '网络原理', score: 82, type: 'warning' },
-  { name: '操作系统', score: 78, type: 'warning' }
+  { name: '存储方式', score: 92, type: 'success' },
+  { name: '节点结构', score: 85, type: 'primary' },
+  { name: '单链表', score: 95, type: 'success' },
+  { name: '双向链表', score: 88, type: 'primary' },
+  { name: '循环链表', score: 82, type: 'warning' },
+  { name: '插入方式', score: 78, type: 'warning' }
 ])
 
 // 学习建议
@@ -552,25 +552,25 @@ const activeResourceTab = ref('exercises')
 // 推荐习题集
 const recommendedExercises = ref([
   {
-    title: '二叉树遍历与应用专题',
+    title: '线性表和链表遍历与应用专题',
     difficulty: '中等',
     difficultyType: 'warning',
     questionCount: 45,
-    reason: '帮助你掌握二叉树的各种遍历方法和实际应用场景'
+    reason: '帮助你掌握线性表和链表的各种遍历方法和实际应用场景'
   },
   {
-    title: '图论算法基础练习',
+    title: '排序和查找算法基础练习',
     difficulty: '简单',
     difficultyType: 'success',
     questionCount: 30,
-    reason: '通过基础图论问题帮助你理解图的表示和基本操作'
+    reason: '通过基础排序问题帮助你理解线性表的表示和基本操作'
   },
   {
-    title: '动态规划经典问题集',
+    title: '排序和查找算法进阶练习',
     difficulty: '困难',
     difficultyType: 'danger',
     questionCount: 35,
-    reason: '包含经典动态规划题目，提升你的算法设计能力'
+    reason: '包含进阶排序和查找算法题目，提升你的算法设计能力'
   }
 ])
 
@@ -584,17 +584,17 @@ const recommendedOJ = ref([
     reason: '适合提升你的代码实现能力'
   },
   {
-    title: '最短路径问题求解',
+    title: '双指针问题求解',
     difficulty: '困难',
     difficultyType: 'danger',
-    type: '图论算法',
-    reason: '帮助你深入理解图论算法的应用'
+    type: '算法实现',
+    reason: '帮助你深入理解链表的应用'
   },
   {
-    title: '简单数据结构实现',
-    difficulty: '简单',
-    difficultyType: 'success',
-    type: '基础训练',
+    title: '滑动窗口问题求解',
+    difficulty: '中等',
+    difficultyType: 'warning',
+    type: '算法实现',
     reason: '巩固基本的数据结构知识'
   }
 ])
@@ -602,10 +602,10 @@ const recommendedOJ = ref([
 // 推荐学习视频
 const recommendedVideos = ref([
   {
-    title: '二叉树数据结构详解',
+    title: '双指针详解',
     duration: '45分钟',
     teacher: '王教授',
-    reason: '系统讲解二叉树的基本概念、遍历方法和实际应用场景'
+    reason: '系统讲解链表的基本概念、遍历方法和实际应用场景'
   },
   {
     title: '常见排序算法分析与实现',
@@ -614,10 +614,10 @@ const recommendedVideos = ref([
     reason: '深入剖析各种排序算法的原理、实现和性能比较'
   },
   {
-    title: '动态规划解题技巧',
+    title: '滑动窗口解题技巧',
     duration: '50分钟',
     teacher: '张教授',
-    reason: '通过经典例题讲解动态规划的思路和解题方法'
+    reason: '通过经典例题讲解滑动窗口的思路和解题方法'
   }
 ])
 
@@ -814,7 +814,7 @@ onMounted(async () => {
         min: 0,
         max: 100,
         axisLabel: {
-          formatter: '{value}分'
+          formatter: '{value}%'
         }
       }
     ],
@@ -835,7 +835,7 @@ onMounted(async () => {
         label: {
           show: true,
           position: 'top',
-          formatter: '{c}分'
+          formatter: '{c}%'
         }
       }
     ]

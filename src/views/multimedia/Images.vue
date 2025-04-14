@@ -5,13 +5,13 @@
       <!-- 左侧图库导航 -->
       <div class="left-panel">
         <h2 class="panel-title">图片库</h2>
-        <el-input
-          v-model="searchQuery"
-          placeholder="搜索图片"
-          prefix-icon="Search"
-          clearable
-          class="search-input"
-        />
+<!--        <el-input-->
+<!--          v-model="searchQuery"-->
+<!--          placeholder="搜索图片"-->
+<!--          prefix-icon="Search"-->
+<!--          clearable-->
+<!--          class="search-input"-->
+<!--        />-->
         <el-tree
           :data="imageCategories"
           :props="defaultProps"
@@ -107,14 +107,6 @@
         <h2 class="panel-title">预览区域</h2>
         <div class="preview-container" v-if="currentImage.url">
           <img :src="currentImage.url" :alt="currentImage.title" class="preview-image" />
-          <div class="preview-info">
-            <h4>{{ currentImage.title }}</h4>
-            <p>{{ currentImage.description }}</p>
-            <div class="preview-meta">
-              <span>分类: {{ currentImage.category }}</span>
-              <span>日期: {{ currentImage.date }}</span>
-            </div>
-          </div>
         </div>
         <el-empty v-else description="暂无预览内容" />
       </div>
@@ -143,27 +135,19 @@ export default {
     // 图片分类数据
     const imageCategories = ref([
       {
-        label: '教学素材',
-        children: [
-          { label: '课件配图' },
-          { label: '实验设备' },
-          { label: '教学场景' }
-        ]
+        label: '我的图片'
       },
       {
-        label: '学生作品',
+        label: '知识点',
         children: [
-          { label: '项目展示' },
-          { label: '实践活动' },
-          { label: '作业成果' }
-        ]
-      },
-      {
-        label: '课程资源',
-        children: [
-          { label: '概念图解' },
-          { label: '流程图' },
-          { label: '教学资料' }
+          { label: '线性表的基本概念' },
+          { label: '单链表' },
+          { label: '双向链表' },
+          { label: '循环链表' },
+          { label: '头插法' },
+          { label: '尾插法' },
+          { label: '删除节点' },
+          { label: '遍历链表' },
         ]
       }
     ])
@@ -173,7 +157,7 @@ export default {
       label: 'label'
     }
 
-    // 模拟图片数据
+    //todo 模拟图片数据
     const images = ref([
       {
         id: 1,
@@ -181,7 +165,8 @@ export default {
         url: 'https://picsum.photos/id/1/800/600',
         thumbnail: 'https://picsum.photos/id/1/400/300',
         description: '这是一张适合教学课件使用的配图，展示了学习场景。',
-        category: '教学素材',
+        // 筛选字段
+        category: '单链表',
         date: '2023-05-15'
       },
       {
@@ -304,7 +289,7 @@ export default {
       setTimeout(async () => {
         isTyping.value = false
 
-        // 添加AI响应
+        //todo  添加AI响应（增加逻辑）-->提交过代码，可以去找
         chatMessages.value.push({
           type: 'ai',
           content: '我理解你的问题，让我思考一下...'

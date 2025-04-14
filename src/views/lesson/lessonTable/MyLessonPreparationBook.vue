@@ -1522,6 +1522,11 @@ const goToTeachingPlan = (chapterId) => {
   }
 }
 
+.edit-button{
+  background-color: rgb(242, 174, 184);
+  border-radius: 50px;
+}
+
 </style>
 
 <!-- 添加全局样式 -->
@@ -1669,8 +1674,5 @@ const goToTeachingPlan = (chapterId) => {
     }
   }
 }
-.edit-button{
-  background-color: rgb(242, 174, 184);
-  border-radius: 50px;
-}
+
 </style>

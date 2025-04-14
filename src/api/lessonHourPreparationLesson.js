@@ -145,6 +145,11 @@ export const createPPT = (teachingContent) => {
   })
 }
 
+//生成ppt资源
+export const getPPTTemplate = () => {
+  return request.get('/multimedia/getTemplate')
+}
+
 //推荐视频资源
 
 //生成图片资源
