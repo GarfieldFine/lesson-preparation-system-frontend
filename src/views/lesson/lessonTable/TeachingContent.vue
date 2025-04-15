@@ -92,8 +92,8 @@
           :class="['template-item', { active: selectedTemplate === index }]"
           @click="selectTemplate(index)"
         >
-          <img :src="template.preview" :alt="template.name" class="template-preview" />
-          <div class="template-name">{{ template.name }}</div>
+          <img :src="template.root.titleCoverImageLarge" :alt="template.industry" class="template-preview" />
+          <div class="template-name">{{ template.industry }}</div>
         </div>
       </div>
     </div>
@@ -149,10 +149,19 @@ const pptTemplates = ref([
 
 // 显示PPT模板对话框的方法
 const showPPTTemplateDialog = async () => {
-  const res = await getPPTTemplate()
-  console.log(res)
-  selectedTemplate.value = null
-  isPPTTemplateDialogVisible.value = true
+  const isExistMultimedia = await handleMultimediaIsExist();
+  if (isExistMultimedia.pptUrl == null || isExistMultimedia.videoUrl == null || isExistMultimedia.imagesUrl == null || isExistMultimedia.pptUrl == '' || isExistMultimedia.videoUrl == '' || isExistMultimedia.imagesUrl == ''){
+    const res = await getPPTTemplate()
+    console.log(res)
+    pptTemplates.value = res.data
+    console.log(pptTemplates.value);
+    selectedTemplate.value = null
+    isPPTTemplateDialogVisible.value = true
+  }else {
+    router.push(`/lesson/lesson_hour/multimedia/ppt/${teacherScheduleId}`);
+    // ElMessage.error("多媒体资源已经生成");
+  }
+
 }
 
 // 选择模板
@@ -523,12 +532,9 @@ const generateMedia = async () => {
   if (isExistMultimedia == null || isExistMultimedia.pptUrl == '' || isExistMultimedia.videoUrl == '' || isExistMultimedia.imagesUrl == '') {
     const teachContent = await handleGetTeachingContent();
     //生成ppt
-    multimedia.value.pptUrl = await handleCreateMultimedia(teachContent);
+    const templateIndexId= pptTemplates.value[selectedTemplate.value].templateIndexId
+    multimedia.value.pptUrl = await handleCreateMultimedia(teachContent,templateIndexId);
     // console.log(multimedia.value.ppt);
-    //生成图片
-
-    //推荐视频
-
     //保存到数据库
     await handleSaveMultimedia();
     ElMessage.success("多媒体资源保存成功");
@@ -538,8 +544,8 @@ const generateMedia = async () => {
   }
 }
 // 生成多媒体资源
-const handleCreateMultimedia = async (teachContent) => {
-  const pptUrl = await createPPT(teachContent);
+const handleCreateMultimedia = async (teachContent,templateIndexId) => {
+  const pptUrl = await createPPT(teachContent,templateIndexId);
   return pptUrl.msg;
 }
 

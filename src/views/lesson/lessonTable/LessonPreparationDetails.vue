@@ -101,6 +101,8 @@ const handleGetMultimedia=async ()=>{
 // 获取备课
 const getLessonPreparation = async () => {
   const res = await getByTeacherScheduleIdService(teacherScheduleId)
+  lessonPreparation.value = res.data
+}
 // 生成多媒体资源
 const handleCreateMultimedia=async (teachContent)=>{
   const pptUrl=await createPPT(teachContent);
@@ -130,8 +132,7 @@ const  handleMultimediaIsExist=async ()=>{
   console.log(res)
   lessonPreparation.value = res.data
 }
-  return res.data;
-}
+
 
 // 判断教学内容是否生成
 const handleTeacherContentIsExist = async () => {
@@ -270,13 +271,13 @@ const teachingTips = [
             <el-icon><Reading /></el-icon>
             教学内容
           </el-menu-item>
-          <el-menu-item index="time" @click="goToTimeAllocation">
-            <el-icon><Timer /></el-icon>
-            时间分配
-          </el-menu-item>
           <el-menu-item index="activities" @click="goToTeachingActivities">
             <el-icon><Document /></el-icon>
             教学活动安排
+          </el-menu-item>
+          <el-menu-item index="time" @click="goToTimeAllocation">
+            <el-icon><Timer /></el-icon>
+            时间分配
           </el-menu-item>
           <el-menu-item index="results" @click="goToExpectedResults">
             <el-icon><Aim /></el-icon>

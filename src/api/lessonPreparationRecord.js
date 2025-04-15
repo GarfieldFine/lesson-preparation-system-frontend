@@ -16,8 +16,12 @@ export const lessonPreparationRecordGetClassNameService = (id) => {
   return request.get(`/lessonPreparationRecord/get/class/${id}`)
 }
 
-export const getLessonPreparationRecordByIdService = (id) => {
+export const getLessonPreparationRecordByTeacherIdService = (id) => {
   return request.get(`/lessonPreparationRecord/get/${id}`)
+}
+
+export const getLessonPreparationRecordByIdService = (id) => {
+  return request.get(`/lessonPreparationRecord/getByid/${id}`)
 }
 
 export const lessonPreparationRecordAddClassService = (id,classId) => {

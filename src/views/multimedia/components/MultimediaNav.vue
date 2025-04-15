@@ -23,9 +23,10 @@ export default {
   setup() {
     const router = useRouter()
     const route = useRoute()
-
+    const teacherScheduleId = 30;
     const navItems = [
-      { name: 'PPT', path: '/lesson/lesson_hour/multimedia/ppt', icon: 'Document' },
+
+      { name: 'PPT', path: `/lesson/lesson_hour/multimedia/ppt/${teacherScheduleId}`, icon: 'Document' },
       { name: '图片', path: '/lesson/lesson_hour/multimedia/images', icon: 'Picture' },
       { name: '思维导图', path: '/lesson/lesson_hour/multimedia/mindmap', icon: 'Connection' },
       { name: '推荐视频', path: '/lesson/lesson_hour/multimedia/videos', icon: 'VideoPlay' }

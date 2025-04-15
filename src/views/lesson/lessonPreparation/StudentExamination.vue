@@ -810,7 +810,7 @@ onMounted(async () => {
   //
   // }
 
-  if(isExamSubmitted.value === 0) {
+  if(+isExamSubmitted.value === 0) {
 
     // 添加页面离开事件监听
     window.addEventListener('beforeunload', handleBeforeUnload)

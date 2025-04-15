@@ -57,16 +57,16 @@ const features = ref([
 
 // 平台数据
 const platformStats = ref([
-  { label: '课程', value: '2,000+', unit: '门' },
-  { label: '用户', value: '100,000+', unit: '人' },
-  { label: '提交', value: '5,000,000+', unit: '次' }
+  { label: '课程', value: '30+', unit: '门' },
+  { label: '用户', value: '100+', unit: '人' },
+  { label: '提交', value: '500+', unit: '次' }
 ])
 
 // 最近备课记录
 const recentLessons = ref([
   {
     title: '数据结构与算法基础',
-    date: '2023-10-15',
+    date: '2025-2-26',
     progress: 90,
     tags: ['计算机科学', '本科必修']
   },
@@ -84,56 +84,72 @@ const recentLessons = ref([
   }
 ])
 
-// 教师资源推荐
-const recommendedResources = ref([
+// 教学网站推荐
+const linkItems = ref([
   {
-    title: '现代教学方法与实践',
-    type: '电子书',
-    icon: 'Document',
-    rating: 4.8,
-    downloads: 1250
+    // 网站标题
+    title: '慕课网',
+    // 网站图表
+    icon: new URL('@/assets/muke.png', import.meta.url).href,
+    // 网站描述
+    desc: '慕课网，程序员的梦工厂。',
+    // 网站链接
+    link: 'https://www.imooc.com/',
   },
   {
-    title: '如何设计有效的课堂互动',
-    type: '视频课程',
-    icon: 'VideoPlay',
-    rating: 4.6,
-    downloads: 980
+    // 网站标题
+    title: '中国大学MOOC',
+    // 网站图表
+    icon: new URL('@/assets/mooc.png', import.meta.url).href,
+    // 网站描述
+    desc: '中国大学MOOC，优质在线课程学习平台。',
+    // 网站链接
+    link: 'https://www.icourse163.org/',
   },
   {
-    title: '教学评估与反馈收集',
-    type: '教学工具',
-    icon: 'Histogram',
-    rating: 4.5,
-    downloads: 850
+    // 网站标题
+    title: 'Gitee码云',
+    // 网站图表
+    icon: 'https://tse1-mm.cn.bing.net/th/id/OIP-C.7QU2bAZD69TGYdJML5koWgHaEo?rs=1&pid=ImgDetMainf',
+    // 网站描述
+    desc: 'gitee优质代码开源平台',
+    // 网站链接
+    link: 'https://gitee.com/',
   }
 ])
 
 // 教学动态
 const teachingNews = ref([
   {
-    title: '2023年教学创新大赛开始报名',
-    date: '2023-10-20',
+    title: '2025年教学创新大赛开始报名',
+    date: '2025-4-15',
     type: '赛事活动'
   },
   {
     title: '新版教学评估系统上线通知',
-    date: '2023-10-18',
+    date: '20235-4-10',
     type: '系统更新'
   },
   {
     title: '关于加强课程思政建设的指导意见',
-    date: '2023-10-16',
+    date: '2025-2-16',
     type: '政策通知'
   }
 ])
+// 建立图标映射
+const iconMap = {
+  Calendar,
+  Document,
+  ChatDotRound,
+  Link
+}
 
 // 常用工具
 const quickTools = ref([
   { name: '课程表', icon: 'Calendar', path: '/lesson/schedule' },
-  { name: '题库管理', icon: 'Document', path: '/lesson/question-bank' },
+  { name: '在线OJ', icon: 'Document', path: 'http://localhost:5174' },
   { name: '学生反馈', icon: 'ChatDotRound', path: '/lesson/feedback' },
-  { name: '教学资源', icon: 'Link', path: '/lesson/resources' }
+  { name: '教师端入口', icon: 'Link', path: 'http://localhost:4000/home' }
 ])
 
 // 导航到备课页面
@@ -155,9 +171,15 @@ const animationState = reactive({
 
 onMounted(() => {
   // 页面加载后依次触发动画
-  setTimeout(() => { animationState.heroLoaded = true }, 300)
-  setTimeout(() => { animationState.featuresLoaded = true }, 800)
-  setTimeout(() => { animationState.statsLoaded = true }, 1200)
+  setTimeout(() => {
+    animationState.heroLoaded = true
+  }, 300)
+  setTimeout(() => {
+    animationState.featuresLoaded = true
+  }, 800)
+  setTimeout(() => {
+    animationState.statsLoaded = true
+  }, 1200)
 })
 </script>
 
@@ -171,18 +193,36 @@ onMounted(() => {
         <p class="subtitle">提升您的教学效率，打造个性化课程，让备课变得轻松愉快</p>
         <div class="action-buttons">
           <el-button type="primary" size="large" @click="navigateToLessonPrep" class="primary-button">
-            <el-icon><Document /></el-icon>开始备课
+            <el-icon>
+              <Document />
+            </el-icon>
+            开始备课
           </el-button>
           <el-button type="success" size="large" @click="navigateToAIPrep" class="success-button">
-            <el-icon><MagicStick /></el-icon>AI辅助备课
+            <el-icon>
+              <MagicStick />
+            </el-icon>
+            AI辅助备课
           </el-button>
         </div>
         <div class="hero-pattern"></div>
       </div>
       <div class="hero-decoration">
-        <div class="floating-icon icon-1"><el-icon><Document /></el-icon></div>
-        <div class="floating-icon icon-2"><el-icon><School /></el-icon></div>
-        <div class="floating-icon icon-3"><el-icon><MagicStick /></el-icon></div>
+        <div class="floating-icon icon-1">
+          <el-icon>
+            <Document />
+          </el-icon>
+        </div>
+        <div class="floating-icon icon-2">
+          <el-icon>
+            <School />
+          </el-icon>
+        </div>
+        <div class="floating-icon icon-3">
+          <el-icon>
+            <MagicStick />
+          </el-icon>
+        </div>
       </div>
     </div>
 
@@ -195,7 +235,8 @@ onMounted(() => {
       </div>
 
       <div class="features-grid">
-        <div v-for="(feature, index) in features" :key="index" class="feature-card" :style="{'animation-delay': index * 0.1 + 's'}">
+        <div v-for="(feature, index) in features" :key="index" class="feature-card"
+             :style="{'animation-delay': index * 0.1 + 's'}">
           <div class="feature-icon">
             <el-icon :size="40" color="#6366f1">
               <component :is="feature.icon" />
@@ -215,11 +256,18 @@ onMounted(() => {
       <p class="section-subtitle">智能备课系统已帮助无数教师提升教学效率和质量</p>
 
       <div class="stats-container">
-        <div v-for="(stat, index) in platformStats" :key="index" class="stat-item" :style="{'animation-delay': index * 0.2 + 's'}">
+        <div v-for="(stat, index) in platformStats" :key="index" class="stat-item"
+             :style="{'animation-delay': index * 0.2 + 's'}">
           <div class="stat-icon">
-            <el-icon :size="30" v-if="index === 0"><Document /></el-icon>
-            <el-icon :size="30" v-else-if="index === 1"><User /></el-icon>
-            <el-icon :size="30" v-else><Histogram /></el-icon>
+            <el-icon :size="30" v-if="index === 0">
+              <Document />
+            </el-icon>
+            <el-icon :size="30" v-else-if="index === 1">
+              <User />
+            </el-icon>
+            <el-icon :size="30" v-else>
+              <Histogram />
+            </el-icon>
           </div>
           <div class="stat-value">{{ stat.value }}</div>
           <div class="stat-label">{{ stat.label }}{{ stat.unit }}</div>
@@ -232,7 +280,10 @@ onMounted(() => {
       <div class="section-header">
         <h2 class="section-title">最近备课</h2>
         <el-button type="primary" plain size="small" class="view-all-button">
-          查看全部 <el-icon class="el-icon--right"><ArrowRight /></el-icon>
+          查看全部
+          <el-icon class="el-icon--right">
+            <ArrowRight />
+          </el-icon>
         </el-button>
       </div>
       <div class="lessons-container">
@@ -245,50 +296,56 @@ onMounted(() => {
             </span>
           </div>
           <div class="lesson-tags">
-            <el-tag v-for="(tag, tagIndex) in lesson.tags" :key="tagIndex" size="small" effect="plain" class="lesson-tag">{{ tag }}</el-tag>
+            <el-tag v-for="(tag, tagIndex) in lesson.tags" :key="tagIndex" size="small" effect="plain"
+                    class="lesson-tag">{{ tag }}
+            </el-tag>
           </div>
           <div class="lesson-progress">
             <span class="progress-label">完成度: {{ lesson.progress }}%</span>
-            <el-progress :percentage="lesson.progress" :stroke-width="8" :color="lesson.progress > 80 ? '#67C23A' : lesson.progress > 50 ? '#E6A23C' : '#F56C6C'" />
+            <el-progress :percentage="lesson.progress" :stroke-width="8"
+                         :color="lesson.progress > 80 ? '#67C23A' : lesson.progress > 50 ? '#E6A23C' : '#F56C6C'" />
           </div>
           <div class="lesson-actions">
             <el-button type="primary" plain size="small">
-              <el-icon><Reading /></el-icon>继续备课
+              <el-icon>
+                <Reading />
+              </el-icon>
+              继续备课
             </el-button>
             <el-button type="info" plain size="small">
-              <el-icon><EditPen /></el-icon>编辑
+              <el-icon>
+                <EditPen />
+              </el-icon>
+              编辑
             </el-button>
           </div>
         </el-card>
       </div>
     </div>
 
-    <!-- 教师资源推荐 -->
+    <!-- 教学网站推荐 -->
     <div class="resources-section">
       <div class="section-header">
-        <h2 class="section-title">教师资源推荐</h2>
-        <p class="section-subtitle">精选优质教学资源，助力您的教学工作</p>
+        <h2 class="section-title" style="margin-left: 30px">教学网站推荐</h2>
+        <p class="section-subtitle">精选优质教学网站，助力您的教学工作</p>
       </div>
-      <div class="resources-container">
-        <el-card v-for="(resource, index) in recommendedResources" :key="index" class="resource-card">
+      <div class="resources-container" style="margin: 0 15px;">
+        <el-card v-for="(item, index) in linkItems" :key="index" class="resource-card">
           <div class="resource-icon">
-            <el-icon :size="30">
-              <component :is="resource.icon" />
-            </el-icon>
+            <img :src="item.icon" alt="网站图标"
+                 style="width: 180px; height: 75px; border-radius: 8px;margin-left: 35px;transform: translateX(-70px)" />
           </div>
           <div class="resource-content">
-            <h3 class="resource-title">{{ resource.title }}</h3>
+            <h3 class="resource-title">{{ item.title }}</h3>
             <div class="resource-meta">
-              <span class="resource-type">{{ resource.type }}</span>
-              <div class="resource-rating">
-                <el-rate v-model="resource.rating" disabled text-color="#ff9900" score-template="{value}" />
-              </div>
+              <span class="resource-type">教育网站</span>
             </div>
-            <div class="resource-downloads">
-              <el-icon><Download /></el-icon> {{ resource.downloads }} 次下载
+            <div class="resource-description" style="margin-top: 10px; color: #6b7280;">
+              {{ item.desc }}
             </div>
           </div>
-          <el-button type="primary" text class="resource-button">查看详情</el-button>
+          <el-button type="primary" text class="resource-button" @click="window.open(item.link, '_blank')">访问网站
+          </el-button>
         </el-card>
       </div>
     </div>
@@ -303,12 +360,16 @@ onMounted(() => {
         </div>
         <div class="news-list">
           <div v-for="(news, index) in teachingNews" :key="index" class="news-item">
-            <div class="news-type-badge" :class="'news-type-' + news.type.replace(/\s+/g, '-').toLowerCase()">{{ news.type }}</div>
+            <div class="news-type-badge" :class="'news-type-' + news.type.replace(/\s+/g, '-').toLowerCase()">
+              {{ news.type }}
+            </div>
             <div class="news-content">
               <h3 class="news-title">{{ news.title }}</h3>
               <span class="news-date">{{ news.date }}</span>
             </div>
-            <el-icon class="news-arrow"><ArrowRight /></el-icon>
+            <el-icon class="news-arrow">
+              <ArrowRight />
+            </el-icon>
           </div>
         </div>
       </div>
@@ -321,7 +382,7 @@ onMounted(() => {
         <div class="tools-grid">
           <div v-for="(tool, index) in quickTools" :key="index" class="tool-item">
             <el-icon :size="24">
-              <component :is="tool.icon" />
+              <component :is="iconMap[tool.icon]" />
             </el-icon>
             <span class="tool-name">{{ tool.name }}</span>
           </div>
@@ -358,11 +419,17 @@ onMounted(() => {
         </div>
       </div>
       <div class="footer-bottom">
-        <p>© 2023 智能备课系统 - 帮助大学教师高效备课的智能平台</p>
+        <p>© 2025 智能备课系统 - 帮助大学教师高效备课的智能平台</p>
         <div class="footer-social">
-          <el-icon :size="20"><ChatDotRound /></el-icon>
-          <el-icon :size="20"><Bell /></el-icon>
-          <el-icon :size="20"><Link /></el-icon>
+          <el-icon :size="20">
+            <ChatDotRound />
+          </el-icon>
+          <el-icon :size="20">
+            <Bell />
+          </el-icon>
+          <el-icon :size="20">
+            <Link />
+          </el-icon>
         </div>
       </div>
     </div>
@@ -466,8 +533,12 @@ onMounted(() => {
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-20px); }
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
 }
 
 .main-title {
@@ -822,7 +893,7 @@ onMounted(() => {
   margin-top: 20px;
 }
 
-/* 教师资源推荐 */
+/* 教学网站推荐 */
 .resources-section {
   padding: 70px 0;
   background-color: #f9fafb;
@@ -854,9 +925,9 @@ onMounted(() => {
 }
 
 .resource-icon {
-  background-color: rgba(99, 102, 241, 0.1);
-  width: 60px;
-  height: 60px;
+  //background-color: rgba(99, 102, 241, 0.1);
+  //width: 60px;
+  //height: 60px;
   border-radius: 12px;
   display: flex;
   align-items: center;

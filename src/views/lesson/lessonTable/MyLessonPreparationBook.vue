@@ -9,7 +9,8 @@ import {
 import { classGetAllNameService } from '@/api/class.js'
 import { useRoute, useRouter } from 'vue-router'
 import { chapterLessonPreparationGetListByLessonPreparationRecordIdService } from '@/api/chapterLessonPreparation.js'
-
+import { h } from 'vue'
+import { ElMessage, ElNotification } from 'element-plus'
 const router = useRouter()
 const LessonPreparationRecId = useRoute().params.lessonPreparationBookId
 const classNameList = ref([])
@@ -23,10 +24,15 @@ const isFinish = ref(1)
 const teachingPlanDialogVisible = ref(false) // 教案章节列表弹窗显示状态
 const chapterList = ref([]) // 教案章节列表
 
+
 onMounted(async () => {
-  const res = await teacherScheduleGetListByLessonPreparationRecIdService(LessonPreparationRecId)
-  // console.log(res)
-  lessonPreparationList.value = res.data
+// 添加loading
+
+    const res = await teacherScheduleGetListByLessonPreparationRecIdService(LessonPreparationRecId)
+    // console.log(res)
+    lessonPreparationList.value = res.data
+
+
   const res1 = await lessonPreparationRecordGetClassNameService(LessonPreparationRecId)
   classNameList.value = res1.data
   const res2 = await classGetAllNameService()
@@ -34,6 +40,7 @@ onMounted(async () => {
   // console.log(res1)
   const res3 = await getLessonPreparationRecordByIdService(LessonPreparationRecId)
   isFinish.value = res3.data.teachingState
+  console.log(res3)
 
 })
 
@@ -306,7 +313,7 @@ const goToTeachingPlan = (chapterId) => {
           <el-button type="primary" class="teaching-tool-button" @click="goToTeachingCalendar">
             <i class="el-icon-date"></i> 教学日历
           </el-button>
-          <el-button v-if="isFinish === 0" type="success" class="teaching-tool-button" @click="openTeachingPlanDialog">
+          <el-button v-if="+isFinish === 0" type="success" class="teaching-tool-button" @click="openTeachingPlanDialog">
             <i class="el-icon-document"></i> 教案
           </el-button>
           <el-button type="warning" class="teaching-tool-button" @click="goToExamGen">
@@ -397,7 +404,7 @@ const goToTeachingPlan = (chapterId) => {
                   <!-- new Date(lesson.fullClassTime) >= new Date() -->
                   <!-- 修改课时卡片中的按钮 -->
                   <el-button
-                    v-if="true"
+                    v-if="new Date(lesson.fullClassTime) >= new Date()"
                     class="edit-button"
                     size="small"
                     @click.stop="openEditPopover(lesson, $event)"

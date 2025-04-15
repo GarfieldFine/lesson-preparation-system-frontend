@@ -86,12 +86,13 @@ const chatMessages = ref([
   },
   {
     type: 'user',
-    content: '帮我生成一道关于函数极值的题目'
+    content: '帮我生成一道关于链表的题目'
   },
   {
     type: 'ai',
-    content: '好的，这是一道关于函数极值的题目：<br><br>已知函数f(x)=x³-3x²+1，求：<br>1) 函数的极值点<br>2) 函数的极值<br>3) 函数在区间[-1,3]上的最大值和最小值'
+    content: '好的，这是一道关于链表的题目：<br><br>链表的优点是：<br>A. 随机访问效率高<br>B. 占用内存空间小<br>C. 插入和删除操作灵活'
   }
+
 ]);
 
 const sendAIPrompt = async () => {

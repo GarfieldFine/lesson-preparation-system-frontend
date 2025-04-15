@@ -5,13 +5,13 @@
       <!-- 左侧思维导图库导航 -->
       <div class="left-panel">
         <h2 class="panel-title">思维导图库</h2>
-<!--        <el-input-->
-<!--          v-model="searchQuery"-->
-<!--          placeholder="搜索思维导图"-->
-<!--          prefix-icon="Search"-->
-<!--          clearable-->
-<!--          class="search-input"-->
-<!--        />-->
+        <!--        <el-input-->
+        <!--          v-model="searchQuery"-->
+        <!--          placeholder="搜索思维导图"-->
+        <!--          prefix-icon="Search"-->
+        <!--          clearable-->
+        <!--          class="search-input"-->
+        <!--        />-->
         <el-tree
           :data="mindmapCategories"
           :props="defaultProps"
@@ -50,7 +50,12 @@
                 <img v-else src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150" alt="用户头像">
               </div>
               <div class="message-content">
-                <div class="message-text" v-html="message.content"></div>
+                <div class="message-text">
+                  <div v-if="/^https?:\/\//.test(message.content)">
+                    <img :src="message.content" class="message-image" alt=""/>
+                  </div>
+                  <div v-else v-html="message.content"></div>
+                </div>
                 <div v-if="message.type === 'ai'" class="message-actions">
                   <button class="action-btn">
                     <i class="fas fa-copy"></i> 复制
@@ -95,7 +100,7 @@
                 </button>
               </div>
             </div>
-            <button class="send-btn">
+            <button class="send-btn" @click="sendAIPrompt">
               <i class="fas fa-paper-plane"></i>
             </button>
           </div>
@@ -105,19 +110,19 @@
       <!-- 右侧预览区域 -->
       <div class="right-panel">
         <h2 class="panel-title">预览区域</h2>
-        <div class="preview-container" v-if="currentMindmap.url">
+        <div class="preview-container" v-if="currentMindmap">
           <div class="mindmap-canvas">
             <img :src="currentMindmap.fullImage" :alt="currentMindmap.title" class="full-mindmap" />
           </div>
-          <div class="preview-info">
-            <h4>{{ currentMindmap.title }}</h4>
-            <p>{{ currentMindmap.description }}</p>
-            <div class="preview-meta">
-              <span>分类: {{ currentMindmap.category }}</span>
-              <span>创建者: {{ currentMindmap.creator }}</span>
-              <span>日期: {{ currentMindmap.date }}</span>
-            </div>
-          </div>
+<!--          <div class="preview-info">-->
+<!--            <h4>{{ currentMindmap.title }}</h4>-->
+<!--            <p>{{ currentMindmap.description }}</p>-->
+<!--            <div class="preview-meta">-->
+<!--              <span>分类: {{ currentMindmap.category }}</span>-->
+<!--              <span>创建者: {{ currentMindmap.creator }}</span>-->
+<!--              <span>日期: {{ currentMindmap.date }}</span>-->
+<!--            </div>-->
+<!--          </div>-->
         </div>
         <el-empty v-else description="暂无预览内容" />
       </div>
@@ -139,14 +144,115 @@ export default {
     const categoryFilter = ref('')
     const viewerVisible = ref(false)
     const currentMindmap = ref({})
+    const aiPrompt = ref('')
+    const isTyping = ref(false)
+    // AI对话消息
+    const chatMessages = ref([
+      {
+        type: 'ai',
+        content: '你好！我是你的AI教学助手。我可以帮你：<br>1. 分析和处理教学图片<br>2. 生成教学相关图片<br>3. 提供图片使用建议<br>4. 回答图片相关问题'
+      }
+    ])
+
+    // 思维导图分类数据
+    const mindmapCategories = ref([
+      {
+        label: '课程规划',
+        children: [
+          { label: '整体规划' },
+          { label: '章节规划' }
+        ]
+      },
+      {
+        label: '知识点',
+        children: [
+          { label: '概念关系' },
+          { label: '重点难点' }
+        ]
+      },
+      {
+        label: '教学流程',
+        children: [
+          { label: '课堂流程' },
+          { label: '实验流程' }
+        ]
+      }
+    ])
+
+    const defaultProps = {
+      children: 'children',
+      label: 'label'
+    }
+
+    // 根据搜索和分类过滤思维导图
+    const filteredMindmaps = computed(() => {
+      return mindmaps.value.filter(mindmap => {
+        const matchesSearch = !searchQuery.value ||
+          mindmap.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+          mindmap.description.toLowerCase().includes(searchQuery.value.toLowerCase())
+
+        const matchesCategory = !categoryFilter.value ||
+          mindmap.category === categoryFilter.value
+
+        return matchesSearch && matchesCategory
+      })
+    })
+
+    // 处理分类树节点点击
+    const handleNodeClick = (data) => {
+      categoryFilter.value = data.label
+    }
+
+    // 选择思维导图
+    const selectMindmap = (mindmap) => {
+      currentMindmap.value = mindmap
+      viewerVisible.value = true
+    }
+
+    // 发送AI提示
+    const sendAIPrompt = async () => {
+      if (!aiPrompt.value.trim()) return
+
+      // 添加用户消息
+      chatMessages.value.push({
+        type: 'user',
+        content: aiPrompt.value
+      })
+
+      // 清空输入框
+      aiPrompt.value = ''
+
+      // 显示AI正在输入
+      isTyping.value = true
+
+      // 模拟AI响应延迟
+      setTimeout(async () => {
+        isTyping.value = false
+
+        chatMessages.value.push({
+          type: 'ai',
+          content: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/%E9%81%8D%E5%8E%86%E9%93%BE%E8%A1%A8.png'
+        })
+      }, 8000)
+    }
 
     // 模拟思维导图数据
     const mindmaps = ref([
       {
+        id: 0,
+        title: '遍历链表',
+        thumbnail: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/%E9%81%8D%E5%8E%86%E9%93%BE%E8%A1%A8.png',
+        fullImage: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/%E9%81%8D%E5%8E%86%E9%93%BE%E8%A1%A8.png',
+        description: '本思维导图展示了课程的整体规划结构，包括各个章节的关系和知识点分布。',
+        category: '课程规划',
+        creator: '张老师',
+        date: '2023-04-15'
+      },
+      {
         id: 1,
-        title: '课程整体规划思维导图',
-        thumbnail: 'https://picsum.photos/id/101/400/300',
-        fullImage: 'https://picsum.photos/id/101/1200/800',
+        title: '循环链表',
+        thumbnail: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/%E5%BE%AA%E7%8E%AF%E9%93%BE%E8%A1%A8.png',
+        fullImage: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/%E5%BE%AA%E7%8E%AF%E9%93%BE%E8%A1%A8.png',
         description: '本思维导图展示了课程的整体规划结构，包括各个章节的关系和知识点分布。',
         category: '课程规划',
         creator: '张老师',
@@ -154,9 +260,9 @@ export default {
       },
       {
         id: 2,
-        title: '第三章知识点关联',
-        thumbnail: 'https://picsum.photos/id/102/400/300',
-        fullImage: 'https://picsum.photos/id/102/1200/800',
+        title: '尾插法',
+        thumbnail: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/%E5%B0%BE%E6%8F%92%E6%B3%95.png',
+        fullImage: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/%E5%B0%BE%E6%8F%92%E6%B3%95.png',
         description: '详细展示了第三章各个知识点之间的关联和层次结构，帮助学生理解知识体系。',
         category: '知识点',
         creator: '李老师',
@@ -164,9 +270,9 @@ export default {
       },
       {
         id: 3,
-        title: '项目教学流程图',
-        thumbnail: 'https://picsum.photos/id/103/400/300',
-        fullImage: 'https://picsum.photos/id/103/1200/800',
+        title: '头插法',
+        thumbnail: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/%E5%A4%B4%E6%8F%92%E6%B3%95.png',
+        fullImage: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/%E5%A4%B4%E6%8F%92%E6%B3%95.png',
         description: '项目式教学的完整流程思维导图，包括项目准备、实施和评估各个环节。',
         category: '教学流程',
         creator: '王老师',
@@ -174,9 +280,9 @@ export default {
       },
       {
         id: 4,
-        title: '核心概念关系图',
-        thumbnail: 'https://picsum.photos/id/104/400/300',
-        fullImage: 'https://picsum.photos/id/104/1200/800',
+        title: '双链表',
+        thumbnail: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/%E5%8F%8C%E9%93%BE%E8%A1%A8.png',
+        fullImage: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/%E5%8F%8C%E9%93%BE%E8%A1%A8.png',
         description: '课程核心概念之间的关系图，展示了各个概念的联系和层次结构。',
         category: '知识点',
         creator: '赵老师',
@@ -185,8 +291,8 @@ export default {
       {
         id: 5,
         title: '单链表',
-        thumbnail: 'https://picsum.photos/id/105/400/300',
-        fullImage: 'https://picsum.photos/id/105/1200/800',
+        thumbnail: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/%E5%8D%95%E9%93%BE%E8%A1%A8.png',
+        fullImage: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/%E5%8D%95%E9%93%BE%E8%A1%A8.png',
         description: '整个学期的教学计划思维导图，包括各个阶段的教学目标和内容安排。',
         category: '单链表',
         creator: '刘老师',
@@ -194,31 +300,15 @@ export default {
       },
       {
         id: 6,
-        title: '实验教学流程',
-        thumbnail: 'https://picsum.photos/id/106/400/300',
-        fullImage: 'https://picsum.photos/id/106/1200/800',
+        title: '链表删除节点',
+        thumbnail: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/%E5%88%A0%E9%99%A4%E8%8A%82%E7%82%B9.png',
+        fullImage: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/%E5%88%A0%E9%99%A4%E8%8A%82%E7%82%B9.png',
         description: '实验教学的完整流程思维导图，包括实验准备、实施和总结各个环节。',
         category: '教学流程',
         creator: '孙老师',
         date: '2023-09-30'
       }
     ])
-
-    // 过滤思维导图
-    const filteredMindmaps = computed(() => {
-      return mindmaps.value.filter(mindmap => {
-        const matchesSearch = mindmap.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-                            mindmap.description.toLowerCase().includes(searchQuery.value.toLowerCase())
-        const matchesCategory = !categoryFilter.value || mindmap.category.includes(categoryFilter.value)
-        return matchesSearch && matchesCategory
-      })
-    })
-
-    // 查看思维导图
-    const viewMindmap = (mindmap) => {
-      currentMindmap.value = mindmap
-      viewerVisible.value = true
-    }
 
     return {
       searchQuery,
@@ -227,7 +317,14 @@ export default {
       filteredMindmaps,
       viewerVisible,
       currentMindmap,
-      viewMindmap
+      mindmapCategories,
+      defaultProps,
+      handleNodeClick,
+      selectMindmap,
+      chatMessages,
+      isTyping,
+      aiPrompt,
+      sendAIPrompt
     }
   }
 }
@@ -581,4 +678,34 @@ textarea {
   font-size: 12px;
   color: #64748b;
 }
+
+.message-content {
+  max-width: 70%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  position: relative;
+}
+
+.message.ai .message-content {
+  background: #f8fafc;
+  color: #1e293b;
+}
+
+.message.user .message-content {
+  background: #0284c7;
+  color: white;
+}
+
+.message-text {
+  line-height: 1.5;
+  white-space: pre-wrap;
+
+  .message-image {
+    max-width: 100%;
+    max-height: 400px;
+    border-radius: 8px;
+    margin: 8px 0;
+  }
+}
+
 </style>

@@ -5,13 +5,13 @@
       <!-- 左侧图库导航 -->
       <div class="left-panel">
         <h2 class="panel-title">图片库</h2>
-<!--        <el-input-->
-<!--          v-model="searchQuery"-->
-<!--          placeholder="搜索图片"-->
-<!--          prefix-icon="Search"-->
-<!--          clearable-->
-<!--          class="search-input"-->
-<!--        />-->
+        <!--        <el-input-->
+        <!--          v-model="searchQuery"-->
+        <!--          placeholder="搜索图片"-->
+        <!--          prefix-icon="Search"-->
+        <!--          clearable-->
+        <!--          class="search-input"-->
+        <!--        />-->
         <el-tree
           :data="imageCategories"
           :props="defaultProps"
@@ -50,7 +50,12 @@
                 <img v-else src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150" alt="用户头像">
               </div>
               <div class="message-content">
-                <div class="message-text" v-html="message.content"></div>
+                <div class="message-text">
+                  <div v-if="/^https?:\/\//.test(message.content)">
+                    <img :src="message.content" class="message-image" alt=""/>
+                  </div>
+                  <div v-else v-html="message.content"></div>
+                </div>
                 <div v-if="message.type === 'ai'" class="message-actions">
                   <button class="action-btn">
                     <i class="fas fa-copy"></i> 复制
@@ -140,7 +145,7 @@ export default {
       {
         label: '知识点',
         children: [
-          { label: '线性表的基本概念' },
+          { label: '链表的基本概念' },
           { label: '单链表' },
           { label: '双向链表' },
           { label: '循环链表' },
@@ -161,78 +166,96 @@ export default {
     const images = ref([
       {
         id: 1,
-        title: '教学课件配图',
-        url: 'https://picsum.photos/id/1/800/600',
-        thumbnail: 'https://picsum.photos/id/1/400/300',
-        description: '这是一张适合教学课件使用的配图，展示了学习场景。',
-        // 筛选字段
-        category: '单链表',
+        title: '链表结构示意图',
+        url: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E5%9B%BE%E7%89%87/%E5%8D%95%E9%93%BE%E8%A1%A82.png',
+        thumbnail: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E5%9B%BE%E7%89%87/%E5%8D%95%E9%93%BE%E8%A1%A82.png',
+        description: '展示了链表的基本结构，包括节点和指针的关系。',
+        category: '链表的基本概念',
         date: '2023-05-15'
       },
       {
-        id: 2,
-        title: '学生项目展示',
-        url: 'https://picsum.photos/id/20/800/600',
-        thumbnail: 'https://picsum.photos/id/20/400/300',
-        description: '学生完成的项目作品展示，体现了创新思维和实践能力。',
-        category: '学生作品',
-        date: '2023-06-22'
-      },
-      {
         id: 3,
-        title: '课程概念图',
-        url: 'https://picsum.photos/id/36/800/600',
-        thumbnail: 'https://picsum.photos/id/36/400/300',
-        description: '课程核心概念的可视化图表，帮助学生理解复杂概念。',
-        category: '课程资源',
+        title: '单链表操作演示',
+        url: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E5%9B%BE%E7%89%87/%E5%8D%95%E9%93%BE%E8%A1%A8.png',
+        thumbnail: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E5%9B%BE%E7%89%87/%E5%8D%95%E9%93%BE%E8%A1%A8.png',
+        description: '展示单链表的基本操作过程。',
+        category: '单链表',
         date: '2023-04-10'
       },
       {
-        id: 4,
-        title: '实验室设备',
-        url: 'https://picsum.photos/id/42/800/600',
-        thumbnail: 'https://picsum.photos/id/42/400/300',
-        description: '实验室设备的高清图片，用于教学演示和设备介绍。',
-        category: '教学素材',
-        date: '2023-07-05'
-      },
-      {
         id: 5,
-        title: '学生小组讨论',
-        url: 'https://picsum.photos/id/64/800/600',
-        thumbnail: 'https://picsum.photos/id/64/400/300',
-        description: '学生小组讨论场景，展示了协作学习的过程。',
-        category: '教学素材',
+        title: '双向链表结构图',
+        url: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E5%9B%BE%E7%89%87/%E5%8F%8C%E5%90%91%E8%BF%9E%E8%A1%A82.png',
+        thumbnail: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E5%9B%BE%E7%89%87/%E5%8F%8C%E5%90%91%E8%BF%9E%E8%A1%A82.png',
+        description: '展示双向链表的节点结构和前后指针。',
+        category: '双向链表',
         date: '2023-08-18'
       },
       {
         id: 6,
-        title: '期末项目作品',
-        url: 'https://picsum.photos/id/65/800/600',
-        thumbnail: 'https://picsum.photos/id/65/400/300',
-        description: '学生期末项目的优秀作品展示。',
-        category: '学生作品',
+        title: '双向链表遍历示例',
+        url: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E5%9B%BE%E7%89%87/%E5%8F%8C%E5%90%91%E9%93%BE%E8%A1%A8.png',
+        thumbnail: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E5%9B%BE%E7%89%87/%E5%8F%8C%E5%90%91%E9%93%BE%E8%A1%A8.png',
+        description: '演示双向链表的双向遍历过程。',
+        category: '双向链表',
         date: '2023-06-30'
       },
       {
         id: 7,
-        title: '教学流程图',
-        url: 'https://picsum.photos/id/76/800/600',
-        thumbnail: 'https://picsum.photos/id/76/400/300',
-        description: '课程教学流程的图形化表示，帮助理解教学过程。',
-        category: '课程资源',
+        title: '循环链表示意图',
+        url: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E5%9B%BE%E7%89%87/%E5%BE%AA%E7%8E%AF%E9%93%BE%E8%A1%A8.png',
+        thumbnail: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E5%9B%BE%E7%89%87/%E5%BE%AA%E7%8E%AF%E9%93%BE%E8%A1%A8.png',
+        description: '展示循环链表的首尾相连特性。',
+        category: '循环链表',
         date: '2023-03-25'
       },
       {
-        id: 8,
-        title: '实践活动照片',
-        url: 'https://picsum.photos/id/91/800/600',
-        thumbnail: 'https://picsum.photos/id/91/400/300',
-        description: '学生参与实践活动的照片记录，展示了动手能力的培养过程。',
-        category: '教学素材',
-        date: '2023-09-12'
+        id: 9,
+        title: '头插法图解',
+        url: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E5%9B%BE%E7%89%87/%E5%A4%B4%E6%8F%92%E6%B3%95.png',
+        thumbnail: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E5%9B%BE%E7%89%87/%E5%A4%B4%E6%8F%92%E6%B3%95.png',
+        description: '详细展示链表头插法的操作步骤。',
+        category: '头插法',
+        date: '2023-09-15'
+      },
+      {
+        id: 11,
+        title: '尾插法示意图',
+        url: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E5%9B%BE%E7%89%87/%E5%B0%BE%E6%8F%92%E6%B3%95.png',
+        thumbnail: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E5%9B%BE%E7%89%87/%E5%B0%BE%E6%8F%92%E6%B3%95.png',
+        description: '展示链表尾插法的基本原理。',
+        category: '尾插法',
+        date: '2023-09-17'
+      },
+      {
+        id: 13,
+        title: '删除节点流程图',
+        url: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E5%9B%BE%E7%89%87/%E5%88%A0%E9%99%A4%E8%8A%82%E7%82%B9.png',
+        thumbnail: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E5%9B%BE%E7%89%87/%E5%88%A0%E9%99%A4%E8%8A%82%E7%82%B9.png',
+        description: '展示链表删除节点的步骤流程。',
+        category: '删除节点',
+        date: '2023-09-19'
+      },
+      {
+        id: 14,
+        title: '节点删除示例',
+        url: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E5%9B%BE%E7%89%87/%E5%88%A0%E9%99%A4%E8%8A%82%E7%82%B9.png',
+        thumbnail: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E5%9B%BE%E7%89%87/%E5%88%A0%E9%99%A4%E8%8A%82%E7%82%B9.png',
+        description: '通过具体示例展示节点的删除过程。',
+        category: '删除节点',
+        date: '2023-09-20'
+      },
+      {
+        id: 15,
+        title: '遍历应用场景',
+        url: 'https://picsum.photos/id/99/800/600',
+        thumbnail: 'https://picsum.photos/id/99/800/600',
+        description: '展示链表遍历在实际应用中的场景。',
+        category: '遍历链表',
+        date: '2023-09-22'
       }
     ])
+
 
     // AI对话消息
     const chatMessages = ref([
@@ -246,7 +269,7 @@ export default {
     const filteredImages = computed(() => {
       return images.value.filter(image => {
         const matchesSearch = image.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-                            image.description.toLowerCase().includes(searchQuery.value.toLowerCase())
+          image.description.toLowerCase().includes(searchQuery.value.toLowerCase())
         const matchesCategory = !categoryFilter.value || image.category.includes(categoryFilter.value)
         return matchesSearch && matchesCategory
       })
@@ -292,11 +315,11 @@ export default {
         //todo  添加AI响应（增加逻辑）-->提交过代码，可以去找
         chatMessages.value.push({
           type: 'ai',
-          content: '我理解你的问题，让我思考一下...'
+          content: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E5%9B%BE%E7%89%87/%E5%B0%BE%E6%8F%92%E6%B3%95.png'
         })
 
         await scrollToBottom()
-      }, 1500)
+      }, 8000)
     }
 
     const scrollToBottom = async () => {
@@ -525,6 +548,13 @@ export default {
 .message-text {
   line-height: 1.5;
   white-space: pre-wrap;
+
+  .message-image {
+    max-width: 100%;
+    max-height: 400px;
+    border-radius: 8px;
+    margin: 8px 0;
+  }
 }
 
 .message-actions {

@@ -139,8 +139,8 @@ export const getMultimedia = (teacherScheduleId) => {
 }
 
 //生成ppt资源
-export const createPPT = (teachingContent) => {
-  return request.post('/multimedia/ppt',{
+export const createPPT = (teachingContent,templateIndexId) => {
+  return request.post(`/multimedia/ppt/${templateIndexId}`,{
     teachingContent
   })
 }

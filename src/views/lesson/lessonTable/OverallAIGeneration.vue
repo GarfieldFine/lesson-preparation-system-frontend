@@ -359,6 +359,7 @@ const teacherScheduleId = route.params.teacherScheduleId
 
 // 页面数据
 const lessonData = ref({
+  teacherScheduleId: teacherScheduleId,
   numberOfLessons: '1',
   totalDuration: 45,
   preparationTime: 5,
@@ -580,19 +581,6 @@ const generateAIResults = async () => {
     ElMessage.success('预期结果生成成功')
     generatingResults.value = false
 
-    // setTimeout(() => {
-    //   lessonData.value.expectedResult = '学生能够理解并掌握本节课的核心概念，能够独立分析和解决相关问题，并能够在实际场景中应用所学知识。'
-    //
-    //   // 生成备选方案
-    //   alternativeResults.value = [
-    //     '学生能够清晰地解释核心概念的基本原理，并能够举例说明其应用场景，同时能够识别和解决基础问题。',
-    //     '学生不仅能够掌握基本知识点，还能够分析复杂问题，提出创新性解决方案，并能够评估不同方案的优缺点。',
-    //     '学生能够建立知识体系，将本节课内容与已学知识融会贯通，并能够进行自主探究和拓展学习。'
-    //   ]
-    //
-    //   ElMessage.success('预期结果生成成功')
-    //   generatingResults.value = false
-    // }, 2000)
   } catch (error) {
     ElMessage.error('生成失败，请重试')
     generatingResults.value = false
@@ -637,20 +625,6 @@ const generateAllWithAI = async () => {
       }
     })
 
-    // 模拟API调用 - 实际项目中应替换为真实的API调用
-
-      // // 生成教学内容
-      // lessonData.value.mainContent = '本节课将重点讲解以下内容：\n1. 核心概念的基本原理和应用场景\n2. 关键知识点的详细解析和示例\n3. 常见问题的解决方法和技巧\n\n通过互动环节加深学生理解，并通过练习巩固所学知识。'
-      //
-      // // 生成预期结果
-      // lessonData.value.expectedResult = '学生能够理解并掌握本节课的核心概念，能够独立分析和解决相关问题，并能够在实际场景中应用所学知识。'
-      //
-      // // 生成备选方案
-      // alternativeResults.value = [
-      //   '学生能够清晰地解释核心概念的基本原理，并能够举例说明其应用场景，同时能够识别和解决基础问题。',
-      //   '学生不仅能够掌握基本知识点，还能够分析复杂问题，提出创新性解决方案，并能够评估不同方案的优缺点。',
-      //   '学生能够建立知识体系，将本节课内容与已学知识融会贯通，并能够进行自主探究和拓展学习。'
-      // ]
       await OverallAiGenerationService(lessonData.value)
 
       // 添加AI回复

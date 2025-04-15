@@ -14,7 +14,7 @@
       </div>
       <div class="course-info-item">
         <span class="info-label">上课时间：</span>
-        <span class="info-value">{{ courseInfo.lessonTime }}</span>
+        <span class="info-value">{{ courseInfo.fullClassTime}}</span>
       </div>
     </div>
 
@@ -128,6 +128,7 @@ import { useRouter,useRoute } from 'vue-router'
 import { CircleCheckFilled } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { addStudentPostLessonFeedbackService } from '@/api/feedback.js'
+import { getScheduleServiceById } from '@/api/teacherSchedule.js'
 
 const router = useRouter()
 const feedbackFormRef = ref(null)
@@ -162,7 +163,7 @@ const rateColors = ['#C6D1DE', '#F7BA2A', '#FF9900']
 
 // 表单数据
 const feedbackForm = ref({
-  teacherScheduleId: 30,
+  teacherScheduleId: teacherScheduleId,
   satisfaction: '',
   ratings: {
     answering: 3,
@@ -220,8 +221,9 @@ const submitFeedback = async () => {
 }
 
 // 页面加载动画效果
-onMounted(() => {
-
+onMounted(async () => {
+  const res = await getScheduleServiceById(teacherScheduleId)
+  courseInfo.value = res.data
   // 初始化页面时可以添加一些额外的动画效果
 })
 </script>

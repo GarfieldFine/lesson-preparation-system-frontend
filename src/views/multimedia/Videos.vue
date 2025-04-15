@@ -9,18 +9,17 @@
       width="80%"
       destroy-on-close
     >
-<!--      todo src是视频-->
+      <!--      todo src是视频-->
       <div class="video-player-container">
         <video-player
           class="vjs-custom-skin"
           ref="videoPlayer"
           :options="playerOptions"
           :volume="0.6"
-          src="https://iflytek-education.oss-cn-beijing.aliyuncs.com/user/2024/06/10/e0be2dbf4f2a44d38c24b6b4efd054f3.mp4"
+          :src="currentVideo.embedUrl"
         />
       </div>
     </el-dialog>
-
 
 
     <multimedia-nav />
@@ -28,13 +27,13 @@
       <!-- 左侧视频库导航 -->
       <div class="left-panel">
         <h2 class="panel-title">视频库</h2>
-<!--        <el-input-->
-<!--          v-model="searchQuery"-->
-<!--          placeholder="搜索视频"-->
-<!--          prefix-icon="Search"-->
-<!--          clearable-->
-<!--          class="search-input"-->
-<!--        />-->
+        <!--        <el-input-->
+        <!--          v-model="searchQuery"-->
+        <!--          placeholder="搜索视频"-->
+        <!--          prefix-icon="Search"-->
+        <!--          clearable-->
+        <!--          class="search-input"-->
+        <!--        />-->
         <el-tree
           :data="videoCategories"
           :props="defaultProps"
@@ -51,7 +50,9 @@
             <div class="video-wrapper">
               <img :src="video.thumbnail" :alt="video.title" class="thumbnail" />
               <div class="play-overlay">
-                <el-icon class="play-icon"><VideoPlay /></el-icon>
+                <el-icon class="play-icon">
+                  <VideoPlay />
+                </el-icon>
               </div>
               <span class="duration">{{ video.duration }}</span>
             </div>
@@ -71,14 +72,23 @@
         <div class="chat-container">
           <div class="chat-messages" ref="messagesContainer">
             <div class="message-date">今天</div>
+
             <div v-for="(message, idx) in chatMessages" :key="idx"
                  :class="['message', message.type]">
+
               <div class="message-avatar">
                 <i v-if="message.type === 'ai'" class="fas fa-robot"></i>
                 <img v-else src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150" alt="用户头像">
               </div>
               <div class="message-content">
-                <div class="message-text" v-html="message.content"></div>
+
+                <div class="message-text">
+                  <div v-if="/^https?:\/\//.test(message.content)">
+                    <img :src="message.content" class="message-image" alt="" />
+                  </div>
+                  <div v-else v-html="message.content"></div>
+                </div>
+
                 <div v-if="message.type === 'ai'" class="message-actions">
                   <button class="action-btn">
                     <i class="fas fa-copy"></i> 复制
@@ -87,6 +97,7 @@
                     <i class="fas fa-thumbs-up"></i> 有帮助
                   </button>
                 </div>
+
               </div>
             </div>
 
@@ -118,13 +129,12 @@
                 <button class="action-btn" title="上传文件">
                   <i class="fas fa-paperclip"></i>
                 </button>
-                <button class="action-btn" title="插入视频">
-                  <i class="fas fa-video"></i>
+                <button class="action-btn" title="插入图片">
+                  <i class="fas fa-image"></i>
                 </button>
               </div>
             </div>
-<!--            点击事件-->
-            <button class="send-btn" @click="sendAIPrompt" >
+            <button class="send-btn" @click="sendAIPrompt" :disabled="!aiPrompt.trim()">
               <i class="fas fa-paper-plane"></i>
             </button>
           </div>
@@ -185,7 +195,6 @@ export default {
     const playerVisible = ref(false)
     const currentVideo = ref({})
     const videoPlayer = ref(null)
-
     // 播放器配置
     let playerOptions = ref({
       // height: 200,
@@ -275,50 +284,64 @@ export default {
     const videos = ref([
       {
         id: 1,
-        title: '高效课堂教学技巧',
+        title: '头插法',
         description: '本视频介绍了提高课堂教学效率的实用技巧和方法。',
         fullDescription: '本视频详细介绍了提高课堂教学效率的实用技巧和方法，包括课堂组织、互动设计、提问技巧等多个方面。适合各学科教师观看学习，帮助改进教学方法，提升教学质量。',
-        thumbnail: 'https://picsum.photos/id/111/400/225',
-        embedUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-        duration: '15:24',
+        thumbnail: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/Snipaste_2025-04-15_00-35-31.png',
+        embedUrl: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/e396bdc8-2984-44ad-ab3c-81fb74dd77d4.mp4',
+        duration: '6:24',
         category: '教学示范',
         views: 1245,
-        uploadDate: '2023-05-15',
+        uploadDate: '2025-03-15',
         tags: ['教学技巧', '课堂管理', '教师发展']
       },
       {
         id: 2,
-        title: '数学概念可视化教学',
+        title: '链表教学视频',
         description: '通过可视化方式讲解抽象数学概念，帮助学生理解。',
         fullDescription: '本视频通过生动的可视化方式讲解抽象数学概念，将复杂的数学理论转化为直观的图像和动画，帮助学生更好地理解和掌握知识点。视频中包含多个实例和应用场景，适合数学教师和学生观看。',
-        thumbnail: 'https://picsum.photos/id/112/400/225',
-        embedUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+        thumbnail: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/Snipaste_2025-04-15_00-36-26.png',
+        embedUrl: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/4ba489c1-28a5-4396-893f-41ffb1c7f321.mp4',
         duration: '23:10',
         category: '课程讲解',
         views: 2367,
-        uploadDate: '2023-06-22',
+        uploadDate: '2025-04-10',
         tags: ['数学教学', '可视化', '概念讲解']
       },
       {
         id: 3,
-        title: '物理实验：电磁感应现象',
+        title: '线性表教学视频',
         description: '详细演示电磁感应实验的操作步骤和注意事项。',
         fullDescription: '本视频详细演示了电磁感应实验的完整操作步骤、实验现象和注意事项。视频中包含多个经典电磁感应实验的演示，并对实验原理进行了深入浅出的讲解，帮助学生理解电磁感应的物理本质。适合物理教师课前准备和学生预习复习使用。',
-        thumbnail: 'https://picsum.photos/id/113/400/225',
-        embedUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+        thumbnail: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/Snipaste_2025-04-15_00-36-47.png',
+        embedUrl: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/54417a4b-bdfd-4de0-b02e-2bf263d6bb40.mp4',
         duration: '18:45',
         category: '实验演示',
         views: 1876,
-        uploadDate: '2023-04-10',
+        uploadDate: '2025-04-10',
+        tags: ['物理实验', '电磁感应', '实验教学']
+      },
+      {
+        id: 4,
+        title: '循环链表',
+        description: '详细演示电磁感应实验的操作步骤和注意事项。',
+        fullDescription: '本视频详细演示了电磁感应实验的完整操作步骤、实验现象和注意事项。视频中包含多个经典电磁感应实验的演示，并对实验原理进行了深入浅出的讲解，帮助学生理解电磁感应的物理本质。适合物理教师课前准备和学生预习复习使用。',
+        thumbnail: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/Snipaste_2025-04-15_00-44-49.png',
+        embedUrl: 'https://iflytek-education.oss-cn-beijing.aliyuncs.com/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/17ef0a2d-8025-482b-9326-6e5d2e29d23d%20%281%29.mp4',
+        duration: '18:45',
+        category: '实验演示',
+        views: 1876,
+        uploadDate: '2025-04-10',
         tags: ['物理实验', '电磁感应', '实验教学']
       }
+
     ])
 
     // 根据搜索和分类过滤视频
     const filteredVideos = computed(() => {
       return videos.value.filter(video => {
         const matchesSearch = video.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-                            video.description.toLowerCase().includes(searchQuery.value.toLowerCase())
+          video.description.toLowerCase().includes(searchQuery.value.toLowerCase())
         const matchesCategory = !categoryFilter.value || video.category === categoryFilter.value
         return matchesSearch && matchesCategory
       })
@@ -337,10 +360,10 @@ export default {
       }
     }
 
-    // 发送AI提示
+    // todo 发送AI提示
     const sendAIPrompt = async () => {
       if (!aiPrompt.value.trim()) return
-
+      // console.log("发送信息")
       const userMessage = {
         type: 'user',
         content: aiPrompt.value
@@ -349,7 +372,7 @@ export default {
 
       // 清空输入并滚动到底部
       aiPrompt.value = ''
-      await nextTick()
+      // await nextTick()
       messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
 
       // 模拟AI回复
@@ -357,16 +380,16 @@ export default {
       setTimeout(() => {
         const aiMessage = {
           type: 'ai',
-          content: '我理解您的问题。这个视频确实展示了一些很好的教学技巧。建议您特别关注视频中关于课堂互动设计的部分，这对提高学生参与度很有帮助。您还可以结合自己的教学实践，思考如何将这些方法应用到具体课程中。'
+          content: '已为您生成专属视频！这段视频是由我们的先进AI系统精心打造的，它结合了您的需求和喜好，通过智能分析和创意编排，呈现出独特而精彩的视觉内容'
         }
         chatMessages.value.push(aiMessage)
         isTyping.value = false
 
         // 滚动到底部
-        nextTick(() => {
-          messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
-        })
-      }, 2000)
+        // nextTick(() => {
+        //   messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
+        // })
+      }, 60000)
     }
 
     return {
@@ -771,16 +794,57 @@ export default {
     height: 8px;
     background: #6366f1;
     border-radius: 50%;
-    animation: typing 1s infinite;
+    display: inline-block;
+    animation: bounce 1.4s infinite ease-in-out both;
 
-    &:nth-child(2) { animation-delay: 0.2s; }
-    &:nth-child(3) { animation-delay: 0.4s; }
+    &:nth-child(1) {
+      animation-delay: -0.32s;
+    }
+
+    &:nth-child(2) {
+      animation-delay: -0.16s;
+    }
+  }
+}
+
+@keyframes bounce {
+  0%, 80%, 100% {
+    transform: scale(0);
+  }
+  40% {
+    transform: scale(1);
+  }
+}
+
+.generating-video {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.loading-spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid #e0e7ff;
+  border-top-color: #6366f1;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
 }
 
 @keyframes typing {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
 }
 
 .chat-input {
@@ -834,7 +898,12 @@ textarea {
   justify-content: center;
   transition: background 0.2s;
 
-  &:hover {
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &:not(:disabled):hover {
     background: #4f46e5;
   }
 
@@ -1099,5 +1168,20 @@ textarea {
 .tag {
   background-color: #f5f7fa;
   color: #606266;
+}
+
+.message {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  align-items: flex-start;
+}
+
+.message.ai {
+  flex-direction: row;
+}
+
+.message.user {
+  flex-direction: row-reverse;
 }
 </style>

@@ -33,6 +33,10 @@ export const ImportClassScheduleService = (fd) => {
   return request.post(`/TeacherSchedule/import/classSchedule`, fd)
 }
 
+export const getScheduleServiceById = (id) => {
+  return request.get(`/TeacherSchedule/${id}`)
+}
+
 
 
 

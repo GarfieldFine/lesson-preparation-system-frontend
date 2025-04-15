@@ -139,7 +139,7 @@
                   class="option-item"
                 >
                   <span class="option-label">{{ String.fromCharCode(65 + optIndex) }}.</span>
-                  <span class="option-content">{{ option.split('.')[1] }}</span>
+                  <span class="option-content">{{ option[1] }}</span>
                 </el-radio>
               </el-radio-group>
             </div>
@@ -418,7 +418,7 @@ defineExpose({
 const submitAnswers = async () => {
   // 直接提交答案数组，不需要转换格式
   await submitPracticeAnswerService(practiceId, JSON.stringify(userAnswers.value))
-  window.location.href = 'http://localhost:4000/student/space/inbox';
+  window.location.href = 'http://localhost:8084/student/space/inbox';
   ElMessage.success('提交成功')
 }
 </script>
